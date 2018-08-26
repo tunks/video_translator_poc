@@ -1,0 +1,6 @@
+framework module Pods_video_translator_poc {
+  umbrella header "Pods-video_translator_poc-umbrella.h"
+
+  export *
+  module * { export * }
+}
