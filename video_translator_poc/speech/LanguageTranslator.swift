@@ -53,14 +53,9 @@ class WatsonLanguageTranslator : Translator {
 class WastonTranslateHandler{
     var textToSpeech =  TextSpeech()
     
-    init(){
-        
-    }
-    
     func handle(result: TranslationResult, language: String?) {
          print(result)
         
-         //print("Synthesis........")
          for translation in result.translations{
             textToSpeech.speech(text: translation.translationOutput, language: language)
          }
@@ -73,12 +68,11 @@ class TextSpeech{
     let voices = AVSpeechSynthesisVoice.speechVoices()
     var voiceToUse: AVSpeechSynthesisVoice?
 
-    init(){
-    }
+ 
     func speech(text: String, language: String?){
         let utterance = AVSpeechUtterance(string: text)
         utterance.voice = AVSpeechSynthesisVoice(language: language)
-        utterance.rate = 0.4
+        utterance.rate = 0.5
         utterance.pitchMultiplier = 0.85
         utterance.volume = 0.8
         synthesizer.continueSpeaking()

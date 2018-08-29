@@ -20,6 +20,28 @@ class Utils{
             print(log!)
         }
     }
+    
+    static func position(start: Int = 0, isFinal: Bool = false, wordMin: Int = 3, of pattern: String) -> (Int, String)? {
+        var text = pattern.substring(from: start, to: pattern.count)
+                          .trimmingCharacters(in: CharacterSet.whitespaces)
+        //do not strip the last word if text is not final
+        if !isFinal{
+            var words = text.components(separatedBy: CharacterSet.whitespaces)
+            var num = 0
+            num = words.count > 1 ? 2: 0
+            words.removeLast(num)
+            if words.count >= wordMin {
+               text = words.joined(separator:  " ")
+            }
+            else {
+                text = ""
+            }
+        
+        }
+        //print("word text : \(text)")
+        let position = text.count > 0 ? start + text.count + 1: start
+        return (position, text)
+    }
 }
 
 extension AVAudioPCMBuffer {
@@ -42,27 +64,15 @@ extension String {
         return (prefix.count, prefix.count*100/pattern.count);
     }
     
-    func wordPrefixRatio(of pattern: String) -> Int? {
-        var words = self.components(separatedBy: CharacterSet.whitespaces)
-        
-        
-        let prefix = self.commonPrefix(with: pattern)
-        //self.
-        return prefix.count*100/pattern.count;
+    func substring(from: Int, to: Int) -> String {
+        let start = index(startIndex, offsetBy: from)
+        let end = index(start, offsetBy: to - from)
+        return String(self[start ..< end])
     }
-    /*
-     func trimmingTrailingSpaces() -> String {
-     var t = self
-     while t.hasSuffix(" ") {
-     t = "" + t.dropLast()
-     }
-     return t
-     }
-     
-     mutating func trimmedTrailingSpaces() {
-     self = self.trimmingTrailingSpaces()
-     }
-     */
+    
+    func substring(range: NSRange) -> String {
+        return substring(from: range.lowerBound, to: range.upperBound)
+    }
 }
 
 

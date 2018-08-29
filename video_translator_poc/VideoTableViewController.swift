@@ -66,6 +66,6 @@ extension VideoTableViewController {
     func rowSelected( data: VideoData){
      NotificationCenter.default.post(name: VideoViewCell.VideoNotification, object: nil,
                                      userInfo: ["data" : data])
-        print("send notification url: \(data.videoUrl)")
+        //print("send notification url: \(data.videoUrl)")
     }
 }

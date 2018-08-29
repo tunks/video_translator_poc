@@ -90,13 +90,11 @@ extension  SpeechProcessor{
             results in
             var accumulator = SpeechRecognitionResultsAccumulator()
             accumulator.add(results: results)
+            var resultData = TranscribeResultData(text: accumulator.bestTranscript, finalResult: false)
             if((results.results?.count)! > 0){
-                let result = results.results![0]
-                if result.finalResults{
-                    let transcript = accumulator.bestTranscript
-                    self.resultHandler.handle(text: transcript)
-                 }
+               resultData.finalResult = results.results![0].finalResults
             }
+            self.resultHandler.handle(_:resultData)
         }
         
         // define recognition settings
@@ -149,7 +147,8 @@ extension SpeechProcessor {
 
 
 extension SpeechProcessor : SpeechTextResultHandleDelegate{
-    func process(data: TextData, completion: (_ text: String?) -> Void) {
+    
+    func process(data: TextPosition, completion: (_ text: String?) -> Void) {
           let sourceLangauge =  "en"//Language.detectedLangauge(data.text)
           self.languageTranslator?.translate(text: data.text!,
                                              source: sourceLangauge,
@@ -160,43 +159,54 @@ extension SpeechProcessor : SpeechTextResultHandleDelegate{
 
 
 protocol SpeechTextResultHandleDelegate {
-    func process(data: TextData, completion: (_ text: String?) ->Void)
+    func process(data: TextPosition, completion: (_ text: String?) ->Void)
 }
 /**
 * Text index
 */
-struct TextData{
+struct TranscribeResultData{
+       var text: String?
+       var finalResult: Bool? = false
+}
+
+struct TextPosition{
     var text: String?
-    var ratio: Int?
+    var position:  Int? = 0
 }
 
 class SpeechTextResultHandler{
-    private var textData: TextData!
+    private var textPosition: TextPosition!
     private var RatioPercent = 20
     var delegate: SpeechTextResultHandleDelegate?
     var targetedLanguage: String?
     
-    func handle(text: String){
-        print(text)
-        if textData == nil{
-           textData = TextData(text: text, ratio: 0)
+    init(){
+        setDefaultTextPosition();
+    }
+    
+    private func setDefaultTextPosition(){
+        textPosition = TextPosition(text: "", position: 0)
+    }
+    
+    func handle(_ result: TranscribeResultData){
+        let text = result.text
+        let start = textPosition.position!
+        let isFinal = result.finalResult!
+        let position = Utils.position(start: start, isFinal: isFinal, wordMin: 5, of: text!)
+        textPosition.position = position?.0
+        textPosition.text = position?.1
+        if (textPosition.position! > start){
+            delegate?.process(data: textPosition, completion: {text in
+               print("collection -- ")
+            })
+            print("-------------------------------------------------")
         }
-        let ratio: (Int,Int) = (textData.text?.characterPrefixRatio(of: text)) as! (Int, Int)
- 
-        if(ratio.1 >= RatioPercent){
-           textData.ratio = ratio.1
-           textData.text = text
-         }
-         else{
-            textData = TextData(text: text, ratio: ratio.1)
-         }
-         //delegate?.process(text: textData.text!)
-        delegate?.process(data: textData, completion: {text in
-            print("collection -- ")
-         })
-
-         Utils.printLog(log: "text ratio: \(ratio)")
-         print("-------------------------------------------------")
+        
+       
+        if isFinal{
+           setDefaultTextPosition()
+        }
+       
     }
 }
 
