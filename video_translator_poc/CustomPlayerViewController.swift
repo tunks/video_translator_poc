@@ -21,8 +21,8 @@ class CustomPlayerViewController:  UIViewController{
     }
 
     var player = VGPlayer()
-    var url1 : URL?
-    
+    var url : URL?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(self.player.displayView)
@@ -31,7 +31,6 @@ class CustomPlayerViewController:  UIViewController{
         self.player.backgroundMode = .proceed
         self.player.delegate = self
         self.player.displayView.delegate = self
-       // self.player.displayView.titleLabel.text = "China NO.1"
         self.player.displayView.snp.makeConstraints { [weak self] (make) in
             guard let strongSelf = self else { return }
             make.top.equalTo(strongSelf.view.snp.top)
@@ -39,6 +38,7 @@ class CustomPlayerViewController:  UIViewController{
             make.right.equalTo(strongSelf.view.snp.right)
             make.height.equalTo(strongSelf.view.snp.width).multipliedBy(3.0/4.0)///3.0/4.0) // you can 9.0/16.0
         }
+        
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -51,12 +51,17 @@ class CustomPlayerViewController:  UIViewController{
         NotificationCenter.default.addObserver(self, selector: #selector(selectLanguage(_:)),
                                                name: langNotification,
                                                object: nil)
+        
+
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: true)
-        self.player.pause()
+        self.player.cleanPlayer()
+        
+        NotificationCenter.default.removeObserver(self, name: VideoViewCell.VideoNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: langNotification, object: nil)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -69,6 +74,7 @@ class CustomPlayerViewController:  UIViewController{
     }
     
     @objc func viewVideo( _ notification : NSNotification){
+        print("video notification \(notification)")
         guard let videoData: VideoTableViewController.VideoData = notification.userInfo!["data"] as? VideoTableViewController.VideoData
         else{
             return
@@ -80,13 +86,13 @@ class CustomPlayerViewController:  UIViewController{
         self.speechProcessor.languageTranslator = WatsonLanguageTranslator()
         self.speechProcessor.targetLanguage = self.selectedLanguage
         self.player.play()
+        self.player.player?.volume = 0.0
     }
     
     @objc func selectLanguage(_ notification : NSNotification){
         let language = notification.userInfo!["data"] as! String
         let code = NSLocale.canonicalLocaleIdentifier(from: language)
         self.selectedLanguage =  code
-        print("language code \(code)")
     }
 }
 
@@ -124,6 +130,7 @@ extension CustomPlayerViewController: VGPlayerViewDelegate {
     }
     func vgPlayerView(didDisplayControl playerView: VGPlayerView) {
        // UIApplication.shared.prefersStatusBarHidden(
+        
     }
 }
 

@@ -14,7 +14,7 @@ struct Credentials {
     static let SpeechWssUrl = "wss://gateway-wdc.watsonplatform.net/speech-to-text/api/v1/recognize"
     static let SpeechUrl = "https://stream.watsonplatform.net/speech-to-text/api/v1/recognize"
     */
-    static let SpeechApikey = "NFfWPo8mN9pbunyePruX40j_hxTW3gWAsg_TfWqYoSVZ"
+    static let SpeechApikey = "X_JuqPDI2AwrKIOFded8aMSZ-g49Zuy2DZETSjcZ8zPJ"
     static let SpeechWssUrl = "wss://gateway-wdc.watsonplatform.net/speech-to-text/api/v1/recognize"
     static let SpeechUrl = "https://stream.watsonplatform.net/speech-to-text/api/v1/recognize"
     

@@ -109,12 +109,14 @@ extension  SpeechProcessor{
             if paused{
                session.stopRequest()
                session.disconnect()
-                print("STT disconnected")
+               languageTranslator?.pause(pause: true)
+               print("STT disconnected")
             }
             else{
                print("STT connected")
                session.connect()
                session.startRequest(settings: settings)
+               languageTranslator?.pause(pause: false)
             }
             isStreaming = paused
         }
@@ -149,11 +151,18 @@ extension SpeechProcessor {
 extension SpeechProcessor : SpeechTextResultHandleDelegate{
     
     func process(data: TextPosition, completion: (_ text: String?) -> Void) {
+          completion(_: data.text)
           let sourceLangauge =  "en"//Language.detectedLangauge(data.text)
           self.languageTranslator?.translate(text: data.text!,
                                              source: sourceLangauge,
-                                             target: self.targetLanguage!)
-          completion(_: data.text)
+                                             target: self.targetLanguage!,
+                                             completion: { text in
+                                                let userInfo:[String : Any] = ["data": text!] 
+                                                NotificationCenter.default.post(name: Utils.LabelTextNotification,
+                                                                                object: nil,
+                                                                                userInfo: userInfo)
+                                             })
+        
     }
 }
 
@@ -197,11 +206,12 @@ class SpeechTextResultHandler{
         textPosition.text = position?.1
         if (textPosition.position! > start){
             delegate?.process(data: textPosition, completion: {text in
-               print("collection -- ")
+                /*let userInfo:[String : Any] = ["data": text!, "isFinal": isFinal]
+                NotificationCenter.default.post(name: Utils.LabelTextNotification,
+                                                object: nil,
+                                                userInfo: userInfo) */
             })
-            print("-------------------------------------------------")
         }
-        
        
         if isFinal{
            setDefaultTextPosition()

@@ -9,7 +9,9 @@
 import AVFoundation
 
 class Utils{
+   public static let LabelTextNotification  = NSNotification.Name("Label_text")
    private static let formatter = DateFormatter()
+    
    static func printLog(log: Any?) {
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS "
         print(formatter.string(from: NSDate() as Date), terminator: "")

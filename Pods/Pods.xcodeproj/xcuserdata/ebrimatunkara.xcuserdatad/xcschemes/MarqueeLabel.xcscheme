@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4546C50A8C62A384725EECB21352BCED"
-               BuildableName = "Pods_video_translator_poc.framework"
-               BlueprintName = "Pods-video_translator_poc"
+               BlueprintIdentifier = "320AD47B0C6BA014D301395D3BFC8FB6"
+               BuildableName = "MarqueeLabel.framework"
+               BlueprintName = "MarqueeLabel"
                ReferencedContainer = "container:Pods.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,9 +45,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4546C50A8C62A384725EECB21352BCED"
-            BuildableName = "Pods_video_translator_poc.framework"
-            BlueprintName = "Pods-video_translator_poc"
+            BlueprintIdentifier = "320AD47B0C6BA014D301395D3BFC8FB6"
+            BuildableName = "MarqueeLabel.framework"
+            BlueprintName = "MarqueeLabel"
             ReferencedContainer = "container:Pods.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

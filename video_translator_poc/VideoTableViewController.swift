@@ -16,8 +16,8 @@ class VideoTableViewController: UITableViewController{
     }
     var dataSource: [VideoData] = []
     var videoItems: [String:String] = [
-                                      /* "innovations_Unlimited.mp4": "AT&T Innovations: Unlimited Deliveries",
-                                       "Innovations_productive.mp4":"AT&T Innovations: It's Productive",*/
+                                      /* "innovations_Unlimited.mp4": "AT&T Innovations: Unlimited Deliveries" ,*/
+                                        "Innovations_productive.mp4":"AT&T Innovations: It's Productive", 
                                        "Fiber_multi_family.mp4": "AT&T Fiber for Multi-family Properties"
                                        ]
     override func viewDidLoad() {

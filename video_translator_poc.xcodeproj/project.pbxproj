@@ -38,6 +38,8 @@
 		049D4AD8212EE81C00668DC0 /* AudioDataConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D4AD7212EE81C00668DC0 /* AudioDataConverter.swift */; };
 		049D4ADC212EEA0000668DC0 /* MyAudioTabProcessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 049D4ADB212EEA0000668DC0 /* MyAudioTabProcessor.m */; };
 		049D4AE6212EED8C00668DC0 /* LanguageTranslator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D4AE5212EED8C00668DC0 /* LanguageTranslator.swift */; };
+		04CE4A4321373A2C00221D5A /* iOSDropDown.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04CE4A4221373A2C00221D5A /* iOSDropDown.framework */; };
+		04FDFE9221364F11008575CF /* MarqueeLabel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04FDFE9121364F11008575CF /* MarqueeLabel.framework */; };
 		30C00439087545AF929E2265 /* Pods_video_translator_pocTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D20993C6C220C7014ED0911 /* Pods_video_translator_pocTests.framework */; };
 		93C18843C3E4D726CF69A91C /* Pods_video_translator_pocUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00CCA2D3E6C242E65D7C308D /* Pods_video_translator_pocUITests.framework */; };
 		94ED8AF3CC4803814BF6FC90 /* Pods_video_translator_poc.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38D145888D686B6555FA2DB2 /* Pods_video_translator_poc.framework */; };
@@ -115,6 +117,9 @@
 		049D4AE3212EEB5200668DC0 /* TextToSpeechV1.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TextToSpeechV1.framework; path = Carthage/Build/iOS/TextToSpeechV1.framework; sourceTree = "<group>"; };
 		049D4AE5212EED8C00668DC0 /* LanguageTranslator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageTranslator.swift; sourceTree = "<group>"; };
 		04BDB7F4212EFA4900136C22 /* RestKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RestKit.framework; path = Carthage/Build/iOS/RestKit.framework; sourceTree = "<group>"; };
+		04CE4A4221373A2C00221D5A /* iOSDropDown.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = iOSDropDown.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		04FDFE9121364F11008575CF /* MarqueeLabel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MarqueeLabel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		04FDFE932137043C008575CF /* DropDown.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = DropDown.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		14DDEE498E5652FD404EA928 /* Pods-video_translator_pocUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-video_translator_pocUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-video_translator_pocUITests/Pods-video_translator_pocUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		30819628885F0F11910AA07F /* Pods-video_translator_poc.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-video_translator_poc.debug.xcconfig"; path = "Pods/Target Support Files/Pods-video_translator_poc/Pods-video_translator_poc.debug.xcconfig"; sourceTree = "<group>"; };
 		38D145888D686B6555FA2DB2 /* Pods_video_translator_poc.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_video_translator_poc.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -130,6 +135,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04CE4A4321373A2C00221D5A /* iOSDropDown.framework in Frameworks */,
+				04FDFE9221364F11008575CF /* MarqueeLabel.framework in Frameworks */,
 				04257381212F162700270462 /* SpeechToTextV1.framework in Frameworks */,
 				04257378212F0A9400270462 /* RestKit.framework in Frameworks */,
 				049D4AC2212E2F6400668DC0 /* SnapKit.framework in Frameworks */,
@@ -259,6 +266,9 @@
 		F0C2A1899DF18ED9CEFF9C67 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				04CE4A4221373A2C00221D5A /* iOSDropDown.framework */,
+				04FDFE932137043C008575CF /* DropDown.framework */,
+				04FDFE9121364F11008575CF /* MarqueeLabel.framework */,
 				04BDB7F4212EFA4900136C22 /* RestKit.framework */,
 				049D4AE3212EEB5200668DC0 /* TextToSpeechV1.framework */,
 				049D4AE1212EEB2E00668DC0 /* LanguageTranslatorV3.framework */,
@@ -433,13 +443,17 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-video_translator_poc/Pods-video_translator_poc-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/MarqueeLabel/MarqueeLabel.framework",
 				"${BUILT_PRODUCTS_DIR}/SnapKit/SnapKit.framework",
 				"${BUILT_PRODUCTS_DIR}/VGPlayer/VGPlayer.framework",
+				"${BUILT_PRODUCTS_DIR}/iOSDropDown/iOSDropDown.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MarqueeLabel.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SnapKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VGPlayer.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/iOSDropDown.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

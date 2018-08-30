@@ -22,7 +22,10 @@ class Language{
 
 
 protocol Translator{
-    func translate(text: String, source: String, target: String )
+    func translate(text: String, source: String, target: String ,
+                   completion:  @escaping (_ text: String?) -> Void)
+    
+    func pause(pause: Bool?)
 }
 
 class WatsonLanguageTranslator : Translator {
@@ -39,12 +42,16 @@ class WatsonLanguageTranslator : Translator {
         self.handler = WastonTranslateHandler()
     }
     
-    func translate(text: String, source: String, target: String){
-        let  request = TranslateRequest(text: [text], modelID: modelId(source, target),
+    func translate(text: String, source: String, target: String, completion: @escaping (_ text: String?) -> Void){
+       let  request = TranslateRequest(text: [text], modelID: modelId(source, target),
                                         source: source, target: target )
         self.translator.translate(request: request, failure: failure, success: { (translation) -> Void in
-            self.handler?.handle(result: translation, language: target)
+            self.handler?.handle(result: translation, language: target, completion: completion)
         })
+    }
+    
+    func pause(pause: Bool?) {
+        self.handler?.textToSpeech.paused = pause!
     }
     
 }
@@ -53,11 +60,11 @@ class WatsonLanguageTranslator : Translator {
 class WastonTranslateHandler{
     var textToSpeech =  TextSpeech()
     
-    func handle(result: TranslationResult, language: String?) {
-         print(result)
-        
-         for translation in result.translations{
-            textToSpeech.speech(text: translation.translationOutput, language: language)
+    func handle(result: TranslationResult, language: String?, completion: (_ text: String?) -> Void) {
+         for translation in result.translations {
+            let output = translation.translationOutput
+            completion(_: output)
+            textToSpeech.speech(text: output, language: language)
          }
     }
     
@@ -67,18 +74,27 @@ class TextSpeech{
     let synthesizer = AVSpeechSynthesizer()
     let voices = AVSpeechSynthesisVoice.speechVoices()
     var voiceToUse: AVSpeechSynthesisVoice?
+    var paused: Bool = false{
+        didSet{
+            if paused {
+                self.pause()
+            }
+        }
+    }
 
  
     func speech(text: String, language: String?){
-        let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: language)
-        utterance.rate = 0.5
-        utterance.pitchMultiplier = 0.85
-        utterance.volume = 0.8
-        synthesizer.continueSpeaking()
-        synthesizer.speak(utterance)
+        if !paused{
+          let utterance = AVSpeechUtterance(string: text)
+           utterance.voice = AVSpeechSynthesisVoice(language: language)
+           utterance.rate = 0.5
+           utterance.pitchMultiplier = 0.85
+           utterance.volume = 0.8
+           synthesizer.continueSpeaking()
+           synthesizer.speak(utterance)
+        }
     }
-    func stop(){
+    private func pause(){
         synthesizer.stopSpeaking(at: AVSpeechBoundary.immediate)
     }
 }
