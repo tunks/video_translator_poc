@@ -31,7 +31,7 @@ class SpeechProcessor: NSObject, PlayerTranslatorDelegate{
     private var dataConverter: AudioDataConverter?
     private var session: SpeechToTextSession!
     private var settings: RecognitionSettings!
-    private var resultHandler = SpeechTextResultHandler()
+    var resultHandler = SpeechTextResultHandler()
     var languageTranslator: Translator?
     var speechToText: SpeechToText!
     var isSessionStarted = false
@@ -188,6 +188,7 @@ class SpeechTextResultHandler{
     private var RatioPercent = 20
     var delegate: SpeechTextResultHandleDelegate?
     var targetedLanguage: String?
+    var enableTranslation: Bool? = true
     
     init(){
         setDefaultTextPosition();
@@ -199,24 +200,31 @@ class SpeechTextResultHandler{
     
     func handle(_ result: TranscribeResultData){
         let text = result.text
-        let start = textPosition.position!
-        let isFinal = result.finalResult!
-        let position = Utils.position(start: start, isFinal: isFinal, wordMin: 5, of: text!)
-        textPosition.position = position?.0
-        textPosition.text = position?.1
-        if (textPosition.position! > start){
-            delegate?.process(data: textPosition, completion: {text in
-                /*let userInfo:[String : Any] = ["data": text!, "isFinal": isFinal]
-                NotificationCenter.default.post(name: Utils.LabelTextNotification,
-                                                object: nil,
-                                                userInfo: userInfo) */
-            })
+        if enableTranslation!{
+            let start = textPosition.position!
+            let isFinal = result.finalResult!
+            let position = Utils.position(start: start, isFinal: isFinal, wordMin: 5, of: text!)
+            textPosition.position = position?.0
+            textPosition.text = position?.1
+            if (textPosition.position! > start){
+                delegate?.process(data: textPosition, completion: {text in
+                })
+            }
+           
+            if isFinal{
+               setDefaultTextPosition()
+            }
         }
-       
-        if isFinal{
-           setDefaultTextPosition()
+        else{
+            //to refactor
+            let userInfo:[String : Any] = ["data": text!]
+            NotificationCenter.default.post(name: Utils.LabelTextNotification,
+                                            object: nil,
+                                            userInfo: userInfo)
         }
        
     }
+    
+    
 }
 

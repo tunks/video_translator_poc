@@ -12,16 +12,19 @@ import AVKit
 import VGPlayer
 
 class CustomPlayerViewController:  UIViewController{
-    private var langNotification =  Notification.Name("SELECTED_LANGUAGE")
     private var speechProcessor : SpeechProcessor!
     private var selectedLanguage: String? = "fr" {
         didSet{
             speechProcessor.targetLanguage = selectedLanguage
         }
     }
-
     var player = VGPlayer()
     var url : URL?
+    var translate: Bool? = true{
+        didSet{
+            self.speechProcessor.resultHandler.enableTranslation = translate
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,10 +52,12 @@ class CustomPlayerViewController:  UIViewController{
                                                name: VideoViewCell.VideoNotification, object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(selectLanguage(_:)),
-                                               name: langNotification,
+                                               name: Utils.LanguageNotification,
                                                object: nil)
         
-
+        NotificationCenter.default.addObserver(self, selector: #selector(enableTranslation(_:)),
+                                               name: Utils.TranslateNotification,
+                                               object: nil)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -61,7 +66,8 @@ class CustomPlayerViewController:  UIViewController{
         self.player.cleanPlayer()
         
         NotificationCenter.default.removeObserver(self, name: VideoViewCell.VideoNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: langNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: Utils.LanguageNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: Utils.TranslateNotification, object: nil)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -86,13 +92,27 @@ class CustomPlayerViewController:  UIViewController{
         self.speechProcessor.languageTranslator = WatsonLanguageTranslator()
         self.speechProcessor.targetLanguage = self.selectedLanguage
         self.player.play()
-        self.player.player?.volume = 0.0
+        if translate!{
+           self.player.player?.volume = 0.0
+        }
     }
     
     @objc func selectLanguage(_ notification : NSNotification){
         let language = notification.userInfo!["data"] as! String
         let code = NSLocale.canonicalLocaleIdentifier(from: language)
         self.selectedLanguage =  code
+    }
+    
+    @objc func enableTranslation(_ notification : NSNotification){
+        self.translate = notification.userInfo!["data"] as? Bool
+        if self.translate!{
+           self.player.player?.volume = 0.0
+           self.speechProcessor.languageTranslator?.pause(pause: false)
+        }
+        else{
+           self.player.player?.volume = 1.0
+           self.speechProcessor.languageTranslator?.pause(pause: true)
+        }
     }
 }
 

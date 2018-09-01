@@ -15,18 +15,16 @@ class VideoTableViewController: UITableViewController{
         var videoUrl: URL?
     }
     var dataSource: [VideoData] = []
-    var videoItems: [String:String] = [
-                                      /* "innovations_Unlimited.mp4": "AT&T Innovations: Unlimited Deliveries" ,*/
-                                        "Innovations_productive.mp4":"AT&T Innovations: It's Productive", 
-                                       "Fiber_multi_family.mp4": "AT&T Fiber for Multi-family Properties"
-                                       ]
+    var videoItems: [String:String] = ["AT&T Fiber for Multi-family Properties":
+                                      "http://dev.etunkara.info/videos/Fiber_multi_family.mp4"]
     override func viewDidLoad() {
         super.viewDidLoad()
         
         for item in videoItems{
-            let names = item.key.components(separatedBy: ".")
-            let url = Bundle.main.url(forResource: "video/"+names[0], withExtension: names[1])
-            dataSource.append(VideoData(title: item.value, videoUrl: url))
+            //let names = item.value.components(separatedBy: ".")
+            //let url = Bundle.main.url(forResource: "video/"+names[0], withExtension: names[1])
+            let url = URL(string: item.value )
+            dataSource.append(VideoData(title: item.key, videoUrl: url))
         }
     }
     

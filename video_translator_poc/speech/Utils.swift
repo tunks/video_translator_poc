@@ -9,7 +9,10 @@
 import AVFoundation
 
 class Utils{
-   public static let LabelTextNotification  = NSNotification.Name("Label_text")
+   public static let LabelTextNotification  = NSNotification.Name("LABEL_TEXT")
+   public static let LanguageNotification =  Notification.Name("SELECTED_LANGUAGE")
+   public static let TranslateNotification =   Notification.Name("TRANSLATE")
+
    private static let formatter = DateFormatter()
     
    static func printLog(log: Any?) {

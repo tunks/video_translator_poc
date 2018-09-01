@@ -11,15 +11,26 @@ import UIKit
 import MarqueeLabel
 import iOSDropDown
 class VideoListViewController: UIViewController{
-
-    private var langNotification =  Notification.Name("SELECTED_LANGUAGE")
     
     @IBOutlet weak var subtitleLabel: MarqueeLabel!
        
     @IBOutlet weak var dropDown: DropDown!
     
-    private let langauges = ["Chinese","French", "Spanish"]
+    @IBOutlet weak var translateSwitch: UISwitch!
+    
+    private let langauges = ["Chinese","French", "Hindi", "Spanish"]
   
+    var translate: Bool?{
+        didSet{
+           // NotificationCenter.default.post(name: Utils.TranslateNotification, object: nil, userInfo: ["data" : translate])
+            NotificationCenter.default.post(name: Utils.TranslateNotification, object: nil, userInfo: ["data" : translate!])
+        }
+    }
+    
+    @IBAction func translateActionToggle(_ sender: UISwitch) {
+        translate = sender.isOn
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // The list of array to display. Can be changed dynamically
@@ -31,6 +42,7 @@ class VideoListViewController: UIViewController{
         dropDown.didSelect{(selectedText , index ,id) in
             self.languageSelected(language: selectedText)
         }
+        
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -43,6 +55,7 @@ class VideoListViewController: UIViewController{
         NotificationCenter.default.addObserver(self,selector: #selector(updateSubtitleLabel(_:)),
                                                name: Utils.LabelTextNotification,
                                                object: nil)
+        self.translate = translateSwitch.isOn
         self.subtitleLabel.text = ""
          //dropDown.showList()
     }
@@ -62,7 +75,7 @@ class VideoListViewController: UIViewController{
     
     
     private func languageSelected(language: String) {
-        NotificationCenter.default.post(name: langNotification,
+        NotificationCenter.default.post(name:  Utils.LanguageNotification,
                                         object: nil,
                                         userInfo: ["data": language])
     }
