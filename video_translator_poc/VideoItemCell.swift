@@ -39,7 +39,7 @@ final class VideoItemCell: Cell<VideoItem>, CellType {
 //        }
         
         // specify the desired height for our cell
-          height = { return 120 }
+          height = { return 170 }
         
         // set a light background color for our cell
         //backgroundColor = UIColor(red:0.984, green:0.988, blue:0.976, alpha:1.00)
