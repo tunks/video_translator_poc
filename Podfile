@@ -27,4 +27,5 @@ target 'video_translator_poc' do
   pod 'VGPlayer', '~> 0.2.0'
   pod 'MarqueeLabel/Swift'
   pod 'iOSDropDown'
+  pod 'Eureka'
 end

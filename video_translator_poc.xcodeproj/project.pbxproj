@@ -18,6 +18,7 @@
 		0425737F212F0A9400270462 /* Starscream.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 049D4ADF212EEB2000668DC0 /* Starscream.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		04257381212F162700270462 /* SpeechToTextV1.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 049D4ADD212EEB1000668DC0 /* SpeechToTextV1.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		04257383212F168000270462 /* SpeechToTextV1.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 049D4ADD212EEB1000668DC0 /* SpeechToTextV1.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		046A7592213CB02800B43511 /* VideoItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CA0C02213C874600936C10 /* VideoItemCell.swift */; };
 		0493A8FD212DC82900125F9D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0493A8FC212DC82900125F9D /* AppDelegate.swift */; };
 		0493A8FF212DC82900125F9D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0493A8FE212DC82900125F9D /* ViewController.swift */; };
 		0493A902212DC82900125F9D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0493A900212DC82900125F9D /* Main.storyboard */; };
@@ -38,7 +39,11 @@
 		049D4AD8212EE81C00668DC0 /* AudioDataConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D4AD7212EE81C00668DC0 /* AudioDataConverter.swift */; };
 		049D4ADC212EEA0000668DC0 /* MyAudioTabProcessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 049D4ADB212EEA0000668DC0 /* MyAudioTabProcessor.m */; };
 		049D4AE6212EED8C00668DC0 /* LanguageTranslator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D4AE5212EED8C00668DC0 /* LanguageTranslator.swift */; };
+		04CA0BFD213C50D600936C10 /* VideoFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CA0BFC213C50D600936C10 /* VideoFormViewController.swift */; };
+		04CA0BFF213C50E300936C10 /* Eureka.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04CA0BFE213C50E300936C10 /* Eureka.framework */; };
+		04CA0C01213C870C00936C10 /* VideoItemCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 04CA0C00213C870C00936C10 /* VideoItemCell.xib */; };
 		04CE4A4321373A2C00221D5A /* iOSDropDown.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04CE4A4221373A2C00221D5A /* iOSDropDown.framework */; };
+		04D1C377213CAEA300A1F449 /* VideoItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1C376213CAEA300A1F449 /* VideoItemRow.swift */; };
 		04FDFE9221364F11008575CF /* MarqueeLabel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04FDFE9121364F11008575CF /* MarqueeLabel.framework */; };
 		30C00439087545AF929E2265 /* Pods_video_translator_pocTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D20993C6C220C7014ED0911 /* Pods_video_translator_pocTests.framework */; };
 		93C18843C3E4D726CF69A91C /* Pods_video_translator_pocUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00CCA2D3E6C242E65D7C308D /* Pods_video_translator_pocUITests.framework */; };
@@ -117,7 +122,12 @@
 		049D4AE3212EEB5200668DC0 /* TextToSpeechV1.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TextToSpeechV1.framework; path = Carthage/Build/iOS/TextToSpeechV1.framework; sourceTree = "<group>"; };
 		049D4AE5212EED8C00668DC0 /* LanguageTranslator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageTranslator.swift; sourceTree = "<group>"; };
 		04BDB7F4212EFA4900136C22 /* RestKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RestKit.framework; path = Carthage/Build/iOS/RestKit.framework; sourceTree = "<group>"; };
+		04CA0BFC213C50D600936C10 /* VideoFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoFormViewController.swift; sourceTree = "<group>"; };
+		04CA0BFE213C50E300936C10 /* Eureka.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Eureka.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		04CA0C00213C870C00936C10 /* VideoItemCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VideoItemCell.xib; sourceTree = "<group>"; };
+		04CA0C02213C874600936C10 /* VideoItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoItemCell.swift; sourceTree = "<group>"; };
 		04CE4A4221373A2C00221D5A /* iOSDropDown.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = iOSDropDown.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		04D1C376213CAEA300A1F449 /* VideoItemRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoItemRow.swift; sourceTree = "<group>"; };
 		04FDFE9121364F11008575CF /* MarqueeLabel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MarqueeLabel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		04FDFE932137043C008575CF /* DropDown.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = DropDown.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		14DDEE498E5652FD404EA928 /* Pods-video_translator_pocUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-video_translator_pocUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-video_translator_pocUITests/Pods-video_translator_pocUITests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -135,6 +145,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04CA0BFF213C50E300936C10 /* Eureka.framework in Frameworks */,
 				04CE4A4321373A2C00221D5A /* iOSDropDown.framework in Frameworks */,
 				04FDFE9221364F11008575CF /* MarqueeLabel.framework in Frameworks */,
 				04257381212F162700270462 /* SpeechToTextV1.framework in Frameworks */,
@@ -206,6 +217,10 @@
 				0493A92E212DE95600125F9D /* VideoListViewController.swift */,
 				049D4ACB212EC5D400668DC0 /* VideoTableViewController.swift */,
 				049D4ACD212EC75000668DC0 /* VideoViewCell.swift */,
+				04CA0BFC213C50D600936C10 /* VideoFormViewController.swift */,
+				04CA0C00213C870C00936C10 /* VideoItemCell.xib */,
+				04CA0C02213C874600936C10 /* VideoItemCell.swift */,
+				04D1C376213CAEA300A1F449 /* VideoItemRow.swift */,
 			);
 			path = video_translator_poc;
 			sourceTree = "<group>";
@@ -266,6 +281,7 @@
 		F0C2A1899DF18ED9CEFF9C67 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				04CA0BFE213C50E300936C10 /* Eureka.framework */,
 				04CE4A4221373A2C00221D5A /* iOSDropDown.framework */,
 				04FDFE932137043C008575CF /* DropDown.framework */,
 				04FDFE9121364F11008575CF /* MarqueeLabel.framework */,
@@ -395,6 +411,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				049D4AD1212EE2C600668DC0 /* video in Resources */,
+				04CA0C01213C870C00936C10 /* VideoItemCell.xib in Resources */,
 				0493A907212DC82B00125F9D /* LaunchScreen.storyboard in Resources */,
 				0493A904212DC82B00125F9D /* Assets.xcassets in Resources */,
 				0493A902212DC82900125F9D /* Main.storyboard in Resources */,
@@ -443,6 +460,7 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-video_translator_poc/Pods-video_translator_poc-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Eureka/Eureka.framework",
 				"${BUILT_PRODUCTS_DIR}/MarqueeLabel/MarqueeLabel.framework",
 				"${BUILT_PRODUCTS_DIR}/SnapKit/SnapKit.framework",
 				"${BUILT_PRODUCTS_DIR}/VGPlayer/VGPlayer.framework",
@@ -450,6 +468,7 @@
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Eureka.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MarqueeLabel.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SnapKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VGPlayer.framework",
@@ -505,11 +524,14 @@
 			files = (
 				0493A92D212DD6AC00125F9D /* CustomPlayerViewController.swift in Sources */,
 				049D4AE6212EED8C00668DC0 /* LanguageTranslator.swift in Sources */,
+				04CA0BFD213C50D600936C10 /* VideoFormViewController.swift in Sources */,
 				049D4AD6212EE79500668DC0 /* Credentials.swift in Sources */,
+				046A7592213CB02800B43511 /* VideoItemCell.swift in Sources */,
 				049D4ACE212EC75000668DC0 /* VideoViewCell.swift in Sources */,
 				049D4ACC212EC5D400668DC0 /* VideoTableViewController.swift in Sources */,
 				04160CCC2131BB0B00788138 /* Utils.swift in Sources */,
 				0493A8FF212DC82900125F9D /* ViewController.swift in Sources */,
+				04D1C377213CAEA300A1F449 /* VideoItemRow.swift in Sources */,
 				0493A92F212DE95600125F9D /* VideoListViewController.swift in Sources */,
 				049D4AD4212EE5A400668DC0 /* SpeechProcessor.swift in Sources */,
 				049D4AD8212EE81C00668DC0 /* AudioDataConverter.swift in Sources */,

@@ -172,6 +172,9 @@
                                 <rect key="frame" x="326" y="313" width="33" height="28"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <state key="normal" title="Setting" image="video_list"/>
+                                <connections>
+                                    <segue destination="FKa-HU-7WV" kind="show" id="daw-Fr-SJB"/>
+                                </connections>
                             </button>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lEv-bh-ax3">
                                 <rect key="frame" x="244" y="310" width="51" height="31"/>
@@ -219,6 +222,21 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="j0E-b5-YpA" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1146.4000000000001" y="600.44977511244383"/>
+        </scene>
+        <!--Video Form View Controller-->
+        <scene sceneID="Myq-lV-OZy">
+            <objects>
+                <viewController id="FKa-HU-7WV" customClass="VideoFormViewController" customModule="video_translator_poc" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Ni8-7t-0aO">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <viewLayoutGuide key="safeArea" id="nrV-50-UkR"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ZYz-t7-wDQ" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2024.8" y="724.58770614692662"/>
         </scene>
     </scenes>
     <resources>
