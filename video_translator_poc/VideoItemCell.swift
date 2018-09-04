@@ -8,12 +8,15 @@
 
 import Foundation
 import Eureka
+import iOSDropDown
 
 final class VideoItemCell: Cell<VideoItem>, CellType {
     
     @IBOutlet weak var videoTitleTextField: UITextField!
     
     @IBOutlet weak var videoUrlTextField: UITextField!
+    
+    @IBOutlet weak var videoLanguageDropdown: DropDown!
     
     required init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -28,15 +31,18 @@ final class VideoItemCell: Cell<VideoItem>, CellType {
         // we do not want our cell to be selected in this case. If you use such a cell in a list then you might want to change this.
         selectionStyle = .none
         // specify the desired height for our cell
-        height = { return 170 }
+        height = { return 230 }
         
-        // set a light background color for our cell
-        //backgroundColor = UIColor(red:0.984, green:0.988, blue:0.976, alpha:1.00)
-        //UIControlEvents
-        videoTitleTextField.addTarget(self, action: #selector(videoTitleEditingBegin(_:)), for: UIControlEvents.editingDidBegin)
-        videoTitleTextField.addTarget(self, action: #selector(videoTitleChanged), for: .editingDidEnd)
+        videoLanguageDropdown.optionArray = Utils.SupportedLangauges
+        videoLanguageDropdown.text = Utils.SupportedLangauges[2]
 
+        //UIControlEvents
+        videoTitleTextField.addTarget(self, action: #selector(videoTitleChanged), for: .editingDidEnd)
         videoUrlTextField.addTarget(self, action: #selector(videoUrlChanged), for: .editingDidEnd)
+        //videoLanguageTextField.addTarget(self, action: #selector(videoLanguageChanged), for: .editingDidEnd)
+        videoLanguageDropdown.didSelect{(selectedText , index ,id) in
+            self.videoLanguageChanged(selectedText)
+        }
     }
     
     override func update() {
@@ -48,9 +54,7 @@ final class VideoItemCell: Cell<VideoItem>, CellType {
         guard let info: VideoItem = row.value else { return }
         self.videoTitleTextField.text =  info.title
         self.videoUrlTextField.text = info.url
-        //videoInfo = info
-       // self.formViewController().tex
-
+        self.videoLanguageDropdown.text = info.language
     }
     
     @objc func videoTitleChanged(){
@@ -67,9 +71,14 @@ final class VideoItemCell: Cell<VideoItem>, CellType {
     
     @objc func videoUrlChanged(){
         if let text = videoUrlTextField.text, !(videoUrlTextField.text?.isEmpty)! {
-            let data = VideoItem(title: videoTitleTextField.text!, url: text)
-            storeVideoInfo(data)
+           let data = VideoItem(title: videoTitleTextField.text!, url: text)
+           storeVideoInfo(data)
         }
+    }
+    
+    func videoLanguageChanged(_ text: String){
+         let data = VideoItem(title: videoTitleTextField.text!, url: videoUrlTextField.text!, language: text)
+         storeVideoInfo(data)
     }
     
     private func storeVideoInfo(_ data: VideoItem){

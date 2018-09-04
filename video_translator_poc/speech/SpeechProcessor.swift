@@ -101,6 +101,7 @@ extension  SpeechProcessor{
         settings = RecognitionSettings(contentType: SpeechProcessor.ContentType)
         settings.interimResults = true
         settings.inactivityTimeout = -1
+      //  settings.
         isSessionStarted = true
     }
     

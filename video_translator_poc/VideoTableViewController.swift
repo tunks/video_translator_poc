@@ -13,15 +13,18 @@ class VideoTableViewController: UITableViewController{
     struct VideoData {
         var title: String?
         var videoUrl: URL?
+        //var language
     }
     var dataSource: [VideoData] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        //VideoDataStore.shared.clear()
         let refreshControl = UIRefreshControl()
         refreshControl.tintColor = UIColor.red
-        refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControlEvents.valueChanged)
+        refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: .valueChanged)
         self.refreshControl = refreshControl
+        //self.refreshControl?.beginRefreshing()
     }
     
     override func viewWillAppear(_ animated: Bool) {

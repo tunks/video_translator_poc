@@ -20,6 +20,7 @@
 		04257383212F168000270462 /* SpeechToTextV1.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 049D4ADD212EEB1000668DC0 /* SpeechToTextV1.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		042991BD213D60C900D734B9 /* DataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042991BC213D60C900D734B9 /* DataStore.swift */; };
 		046A7592213CB02800B43511 /* VideoItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CA0C02213C874600936C10 /* VideoItemCell.swift */; };
+		048AC558213EC1BB008CD398 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 048AC557213EC1BB008CD398 /* Settings.bundle */; };
 		0493A8FD212DC82900125F9D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0493A8FC212DC82900125F9D /* AppDelegate.swift */; };
 		0493A8FF212DC82900125F9D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0493A8FE212DC82900125F9D /* ViewController.swift */; };
 		0493A902212DC82900125F9D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0493A900212DC82900125F9D /* Main.storyboard */; };
@@ -90,6 +91,7 @@
 		00CCA2D3E6C242E65D7C308D /* Pods_video_translator_pocUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_video_translator_pocUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		04160CCB2131BB0B00788138 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		042991BC213D60C900D734B9 /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
+		048AC557213EC1BB008CD398 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		0493A8F9212DC82900125F9D /* video_translator_poc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = video_translator_poc.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0493A8FC212DC82900125F9D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0493A8FE212DC82900125F9D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -206,6 +208,7 @@
 		0493A8FB212DC82900125F9D /* video_translator_poc */ = {
 			isa = PBXGroup;
 			children = (
+				04160CCB2131BB0B00788138 /* Utils.swift */,
 				049D4AD2212EE58F00668DC0 /* speech */,
 				049D4ACF212ED15100668DC0 /* video */,
 				0493A8FC212DC82900125F9D /* AppDelegate.swift */,
@@ -224,6 +227,7 @@
 				04CA0C02213C874600936C10 /* VideoItemCell.swift */,
 				04D1C376213CAEA300A1F449 /* VideoItemRow.swift */,
 				042991BC213D60C900D734B9 /* DataStore.swift */,
+				048AC557213EC1BB008CD398 /* Settings.bundle */,
 			);
 			path = video_translator_poc;
 			sourceTree = "<group>";
@@ -263,7 +267,6 @@
 				049D4ADB212EEA0000668DC0 /* MyAudioTabProcessor.m */,
 				049D4ADA212EEA0000668DC0 /* video_translator_poc-Bridging-Header.h */,
 				049D4AE5212EED8C00668DC0 /* LanguageTranslator.swift */,
-				04160CCB2131BB0B00788138 /* Utils.swift */,
 			);
 			path = speech;
 			sourceTree = "<group>";
@@ -417,6 +420,7 @@
 				04CA0C01213C870C00936C10 /* VideoItemCell.xib in Resources */,
 				0493A907212DC82B00125F9D /* LaunchScreen.storyboard in Resources */,
 				0493A904212DC82B00125F9D /* Assets.xcassets in Resources */,
+				048AC558213EC1BB008CD398 /* Settings.bundle in Resources */,
 				0493A902212DC82900125F9D /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -70,8 +70,8 @@ extension VideoItem:  Codable {
 class VideoDataStore: DataStore{
     static let WordLimit = "word_limit"
     private let KeyIndex = "video_key_indexes"
-    private let encoder =  JSONEncoder()
-    private let decoder = JSONDecoder()
+   // private let encoder =  JSONEncoder()
+    //private let decoder = JSONDecoder()
     
     static let shared = VideoDataStore()
 
@@ -108,6 +108,7 @@ class VideoDataStore: DataStore{
     }
     
     func values() -> [VideoItem] {
+        //clear()
         let keys = keyIndexes()
         //print("keys \(keys)")
         var values: [VideoItem] = []
@@ -146,6 +147,7 @@ extension VideoDataStore{
         var keys = keyIndexes()
         if let index = Int(key){
            keys.remove(at: index)
+           UserDefaults.standard.set(keys, forKey: KeyIndex)
         }
     }
 }

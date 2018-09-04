@@ -18,7 +18,7 @@ class VideoListViewController: UIViewController{
     
     @IBOutlet weak var translateSwitch: UISwitch!
     
-    private let langauges = ["Chinese","French", "Hindi", "Spanish"]
+    //private let langauges = ["Chinese","French", "Hindi", "Spanish"]
   
     var translate: Bool?{
         didSet{
@@ -33,11 +33,10 @@ class VideoListViewController: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         // The list of array to display. Can be changed dynamically
-        dropDown.optionArray = langauges
+        dropDown.optionArray = Utils.SupportedLangauges
         //Its Id Values and its optional
-        //dropDown.optionIds = [1,23,54,22]
         // The the Closure returns Selected Index and String
-        dropDown.text = langauges[1]
+        dropDown.text = Utils.SupportedLangauges[1]
         dropDown.didSelect{(selectedText , index ,id) in
             self.languageSelected(language: selectedText)
         }
@@ -77,6 +76,13 @@ class VideoListViewController: UIViewController{
         NotificationCenter.default.post(name:  Utils.LanguageNotification,
                                         object: nil,
                                         userInfo: ["data": language])
+    }
+    
+    private func refreshVideoTableView(){
+        if let ctrl: VideoTableViewController = storyboard?.instantiateViewController(withIdentifier: "VideoTableViewController")
+                    as? VideoTableViewController {
+              ctrl.refreshControl?.beginRefreshing()
+        }
     }
     
 }

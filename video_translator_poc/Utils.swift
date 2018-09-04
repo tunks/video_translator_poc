@@ -13,7 +13,7 @@ class Utils{
    public static let LabelTextNotification  = NSNotification.Name("LABEL_TEXT")
    public static let LanguageNotification =  Notification.Name("SELECTED_LANGUAGE")
    public static let TranslateNotification =   Notification.Name("TRANSLATE")
-
+   public static let SupportedLangauges = ["Chinese","French", "English","Hindi", "Spanish"]
    private static let formatter = DateFormatter()
     
    static func printLog(log: Any?) {
@@ -58,6 +58,24 @@ class Utils{
             }
         }
         return false
+    }
+    
+    static func registerDefaultsFromSettingsBundle()
+    {
+        let settingsUrl = Bundle.main.url(forResource: "Settings", withExtension: "bundle")!.appendingPathComponent("Root.plist")
+        let settingsPlist = NSDictionary(contentsOf:settingsUrl)!
+        let preferences = settingsPlist["PreferenceSpecifiers"] as! [NSDictionary]
+        
+        var defaultsToRegister = Dictionary<String, Any>()
+        
+        for preference in preferences {
+            guard let key = preference["Key"] as? String else {
+                NSLog("Key not fount")
+                continue
+            }
+            defaultsToRegister[key] = preference["DefaultValue"]
+        }
+        UserDefaults.standard.register(defaults: defaultsToRegister)
     }
 }
 
