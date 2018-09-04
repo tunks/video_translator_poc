@@ -15,8 +15,13 @@ class VideoTableViewController: UITableViewController{
         var videoUrl: URL?
     }
     var dataSource: [VideoData] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        let refreshControl = UIRefreshControl()
+        refreshControl.tintColor = UIColor.red
+        refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControlEvents.valueChanged)
+        self.refreshControl = refreshControl
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -29,6 +34,7 @@ class VideoTableViewController: UITableViewController{
     }
     
     private func populateVideoData(){
+        dataSource.removeAll()
         let videoItems = VideoDataStore.shared.values()
         for item in videoItems{
             if Utils.verifyUrl(urlString: item.url){
@@ -42,6 +48,7 @@ class VideoTableViewController: UITableViewController{
             self.tableView.selectRow(at: firstIndexPath, animated: true, scrollPosition: .top)
             self.rowSelected(data: dataSource[0])
         }
+        
     }
 }
 
@@ -75,5 +82,20 @@ extension VideoTableViewController {
      NotificationCenter.default.post(name: VideoViewCell.VideoNotification, object: nil,
                                      userInfo: ["data" : data])
         //print("send notification url: \(data.videoUrl)")
+    }
+}
+
+extension VideoTableViewController{
+    @objc func handleRefresh(_ refreshControl: UIRefreshControl) {
+        
+//        let newHotel = Hotels(name: "Montage Laguna Beach", place:
+//            "California south")
+//        hotels.append(newHotel)
+//
+//        hotels.sort() { $0.name < $0.place }
+        self.populateVideoData()
+        
+        self.tableView.reloadData()
+        self.refreshControl?.endRefreshing()
     }
 }

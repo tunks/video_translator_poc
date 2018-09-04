@@ -32,7 +32,10 @@ final class VideoItemCell: Cell<VideoItem>, CellType {
         
         // set a light background color for our cell
         //backgroundColor = UIColor(red:0.984, green:0.988, blue:0.976, alpha:1.00)
+        //UIControlEvents
+        videoTitleTextField.addTarget(self, action: #selector(videoTitleEditingBegin(_:)), for: UIControlEvents.editingDidBegin)
         videoTitleTextField.addTarget(self, action: #selector(videoTitleChanged), for: .editingDidEnd)
+
         videoUrlTextField.addTarget(self, action: #selector(videoUrlChanged), for: .editingDidEnd)
     }
     
@@ -46,7 +49,7 @@ final class VideoItemCell: Cell<VideoItem>, CellType {
         self.videoTitleTextField.text =  info.title
         self.videoUrlTextField.text = info.url
         //videoInfo = info
-        self.formViewController().tex
+       // self.formViewController().tex
 
     }
     
@@ -55,6 +58,11 @@ final class VideoItemCell: Cell<VideoItem>, CellType {
            let data = VideoItem(title: text, url: videoUrlTextField.text!)
            storeVideoInfo(data)
         }
+    }
+    
+    @objc func videoTitleEditingBegin(_ textField: UITextField){
+        formViewController()?.beginEditing(of: self)
+        formViewController()?.textInputDidBeginEditing(textField, cell: self)
     }
     
     @objc func videoUrlChanged(){
