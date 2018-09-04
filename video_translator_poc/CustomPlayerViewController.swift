@@ -12,17 +12,23 @@ import AVKit
 import VGPlayer
 
 class CustomPlayerViewController:  UIViewController{
-    private var speechProcessor : SpeechProcessor!
-    private var selectedLanguage: String? = "fr" {
-        didSet{
-            speechProcessor.targetLanguage = selectedLanguage
-        }
-    }
     var player = VGPlayer()
     var url : URL?
+    private var speechProcessor : SpeechProcessor!
+
+    private var selectedLanguage: String? = "fr" {
+        didSet{
+            if speechProcessor != nil {
+               speechProcessor.targetLanguage = selectedLanguage
+            }
+        }
+    }
+
     var translate: Bool? = true{
         didSet{
-            self.speechProcessor.resultHandler.enableTranslation = translate
+            if speechProcessor != nil {
+               speechProcessor.resultHandler.enableTranslation = translate
+            }
         }
     }
 
@@ -76,24 +82,24 @@ class CustomPlayerViewController:  UIViewController{
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     @objc func viewVideo( _ notification : NSNotification){
-        print("video notification \(notification)")
         guard let videoData: VideoTableViewController.VideoData = notification.userInfo!["data"] as? VideoTableViewController.VideoData
         else{
             return
         }
-        self.speechProcessor = SpeechProcessor()
         self.player.replaceVideo(videoData.videoUrl!)
         self.player.displayView.titleLabel.text = videoData.title
-        self.speechProcessor.connectPlayer(player: self.player.player, itemUrl: videoData.videoUrl)
-        self.speechProcessor.languageTranslator = WatsonLanguageTranslator()
-        self.speechProcessor.targetLanguage = self.selectedLanguage
-        self.player.play()
-        if translate!{
-           self.player.player?.volume = 0.0
+        if assetExists(self.player.playerAsset!){
+            self.speechProcessor = SpeechProcessor()
+            self.speechProcessor.connectPlayer(player: self.player.player, itemUrl: videoData.videoUrl)
+            self.speechProcessor.languageTranslator = WatsonLanguageTranslator()
+            self.speechProcessor.targetLanguage = self.selectedLanguage
+            self.player.play()
+            if translate!{
+               self.player.player?.volume = 0.0
+            }
         }
     }
     
@@ -104,15 +110,22 @@ class CustomPlayerViewController:  UIViewController{
     }
     
     @objc func enableTranslation(_ notification : NSNotification){
-        self.translate = notification.userInfo!["data"] as? Bool
-        if self.translate!{
-           self.player.player?.volume = 0.0
-           self.speechProcessor.languageTranslator?.pause(pause: false)
+        if speechProcessor != nil {
+            self.translate = notification.userInfo!["data"] as? Bool
+            if self.translate!{
+               self.player.player?.volume = 0.0
+               self.speechProcessor.languageTranslator?.pause(pause: false)
+            }
+            else{
+               self.player.player?.volume = 1.0
+               self.speechProcessor.languageTranslator?.pause(pause: true)
+            }
         }
-        else{
-           self.player.player?.volume = 1.0
-           self.speechProcessor.languageTranslator?.pause(pause: true)
-        }
+    }
+    
+    private func assetExists(_ asset: AVURLAsset) -> Bool{
+        let length = Float(asset.duration.value)/Float(asset.duration.timescale)
+        return length > 0
     }
 }
 
@@ -121,13 +134,14 @@ extension CustomPlayerViewController: VGPlayerDelegate {
         print(error)
     }
     func vgPlayer(_ player: VGPlayer, stateDidChange state: VGPlayerState) {
-        switch state {
-        case .playing:
-             self.speechProcessor.toggleSession(paused: false)
-        default:
-             self.speechProcessor.toggleSession(paused: true)
+        if speechProcessor != nil {
+            switch state {
+            case .playing:
+                 self.speechProcessor.toggleSession(paused: false)
+            default:
+                 self.speechProcessor.toggleSession(paused: true)
+            }
         }
-        
     }
     func vgPlayer(_ player: VGPlayer, bufferStateDidChange state: VGPlayerBufferstate) {
         print("buffer State", state)

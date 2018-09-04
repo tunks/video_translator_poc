@@ -22,7 +22,6 @@ class VideoListViewController: UIViewController{
   
     var translate: Bool?{
         didSet{
-           // NotificationCenter.default.post(name: Utils.TranslateNotification, object: nil, userInfo: ["data" : translate])
             NotificationCenter.default.post(name: Utils.TranslateNotification, object: nil, userInfo: ["data" : translate!])
         }
     }

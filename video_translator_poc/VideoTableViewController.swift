@@ -15,23 +15,33 @@ class VideoTableViewController: UITableViewController{
         var videoUrl: URL?
     }
     var dataSource: [VideoData] = []
-    var videoItems: [String:String] = ["AT&T Fiber for Multi-family Properties":
-                                      "http://dev.etunkara.info/videos/Fiber_multi_family.mp4"]
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        for item in videoItems{
-            //let names = item.value.components(separatedBy: ".")
-            //let url = Bundle.main.url(forResource: "video/"+names[0], withExtension: names[1])
-            let url = URL(string: item.value )
-            dataSource.append(VideoData(title: item.key, videoUrl: url))
-        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        let firstIndexPath = IndexPath(row: 0, section: 0)
-        self.tableView.selectRow(at: firstIndexPath, animated: true, scrollPosition: .top)
-        self.rowSelected(data: dataSource[0])
+        super.viewWillAppear(animated)
+        populateVideoData();
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    }
+    
+    private func populateVideoData(){
+        let videoItems = VideoDataStore.shared.values()
+        for item in videoItems{
+            if Utils.verifyUrl(urlString: item.url){
+                let url = URL(string: item.url)
+                dataSource.append(VideoData(title: item.title, videoUrl: url))
+            }
+        }
+        
+        if !dataSource.isEmpty {
+            let firstIndexPath = IndexPath(row: 0, section: 0)
+            self.tableView.selectRow(at: firstIndexPath, animated: true, scrollPosition: .top)
+            self.rowSelected(data: dataSource[0])
+        }
     }
 }
 
@@ -40,7 +50,7 @@ extension VideoTableViewController {
     //MARK: - table view data source
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return dataSource.count
+        return dataSource.count// + 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell{

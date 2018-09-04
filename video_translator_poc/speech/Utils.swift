@@ -7,6 +7,7 @@
 //
 
 import AVFoundation
+import UIKit
 
 class Utils{
    public static let LabelTextNotification  = NSNotification.Name("LABEL_TEXT")
@@ -47,6 +48,17 @@ class Utils{
         let position = text.count > 0 ? start + text.count + 1: start
         return (position, text)
     }
+    
+    static func verifyUrl (urlString: String?) -> Bool {
+        if let urlString = urlString {
+            // create NSURL instance
+            if let url = URL(string: urlString) {
+                // check if your application can open the NSURL instance
+                return UIApplication.shared.canOpenURL(url)
+            }
+        }
+        return false
+    }
 }
 
 extension AVAudioPCMBuffer {
@@ -65,7 +77,6 @@ extension String {
      */
     func characterPrefixRatio(of pattern: String) -> (Int?,Int?)  {
         let prefix = self.commonPrefix(with: pattern)
-        //self.
         return (prefix.count, prefix.count*100/pattern.count);
     }
     

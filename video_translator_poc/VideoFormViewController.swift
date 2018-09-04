@@ -9,41 +9,51 @@
 import Foundation
 import Eureka
 
-
-struct VideoItem: Equatable{
-    var title: String?
-    var url: String?
-    var language: String?
-}
 class VideoFormViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        /*form +++ Section("Video Lists")
-            <<< VideoItemRow { row in
-                row.value = VideoItem(title: "Video Title 1",
-                                      url: "http://lh4.ggpht.com/VpeucXbRtK2pmVY6At76vU45Q7YWXB6kz25Sm_JKW1tgfmJDP3gSAlDwowjGEORSM-EW=w300",
-                                      language: "English")
-            }
-        */
+        //VideoDataStore.shared.clear()
+        let videoItems = VideoDataStore.shared.values()
+       
+        form +++ Section("Translation")
+            <<< TextRow(){ row in
+                row.title = "Word Limit"
+                row.placeholder = "Enter limit here"
+                row.value = VideoDataStore.shared.get(key: VideoDataStore.WordLimit)
+            }.onChange({ text in
+                VideoDataStore.shared.set(key: VideoDataStore.WordLimit, value: text.value!)
+            })
+        
+    
         form +++
             MultivaluedSection(multivaluedOptions: [.Reorder, .Insert, .Delete],
-                               header: "Multivalued TextField",
-                               footer: ".Insert adds a 'Add Item' (Add New Tag) button row as last cell.") {
-                                $0.addButtonProvider = { section in
+                               header: "Video List Setting") {
+                               $0.addButtonProvider = { section in
                                     return ButtonRow(){
-                                        $0.title = "Add New Tag"
+                                        $0.title = "Add New Video Item"
                                     }
                                 }
+                                
                                 $0.multivaluedRowToInsertAt = { index in
-                                    /*return NameRow() {
-                                        $0.placeholder = "Tag Name"
-                                    }
-                                  */
                                     return VideoItemRow()
                                 }
-//                                $0 <<< NameRow() {
-//                                    $0.placeholder = "Tag Name"
-//                                }
+                                
+                                for item in videoItems{
+                                    $0 <<< VideoItemRow() {
+                                        $0.value = item
+                                    }
+                                }
         }
     }
+    
+    override func  rowsHaveBeenRemoved(_ rows: [BaseRow], at indexes: [IndexPath]) {
+        super.rowsHaveBeenRemoved(rows, at: indexes)
+        for index in indexes{
+            let number: Int = index.item
+            let key = String(number)
+            VideoDataStore.shared.remove(key: key)
+            //print("Row removed \(key)")
+        }
+    }
+
 }
