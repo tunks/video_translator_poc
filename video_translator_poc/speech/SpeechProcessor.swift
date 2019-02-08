@@ -136,9 +136,12 @@ extension SpeechProcessor : MYAudioTabProcessorDelegate {
 extension SpeechProcessor {
     func configureAudioSession() {
         do {
-            let audioSession = AVAudioSession.sharedInstance()
-            try audioSession.setCategory(AVAudioSessionCategoryPlayAndRecord, with: [.defaultToSpeaker, .mixWithOthers])
+            /*let audioSession = AVAudioSession.sharedInstance()
+            audioSession.setCategory(convertFromAVAudioSessionCategory(AVAudioSession.Category.playAndRecord), mode: [.defaultToSpeaker, .mixWithOthers])
             try audioSession.setActive(true)
+           */
+            try AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .default, options: [])
+
         } catch {
             print("Failed to setup the AVAudioSession.")
         }
@@ -210,3 +213,8 @@ class SpeechTextResultHandler{
     }
 }
 
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromAVAudioSessionCategory(_ input: AVAudioSession.Category) -> String {
+	return input.rawValue
+}

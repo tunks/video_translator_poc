@@ -17,23 +17,27 @@
 import Foundation
 
 /** CreateAcousticModel. */
-internal struct CreateAcousticModel: Encodable {
+internal struct CreateAcousticModel: Codable, Equatable {
 
     /**
      The name of the base language model that is to be customized by the new custom acoustic model. The new custom model
-     can be used only with the base model that it customizes. To determine whether a base model supports acoustic model
-     customization, refer to [Language support for
-     customization](https://console.bluemix.net/docs/services/speech-to-text/custom.html#languageSupport).
+     can be used only with the base model that it customizes.
+     To determine whether a base model supports acoustic model customization, refer to [Language support for
+     customization](https://cloud.ibm.com/docs/services/speech-to-text/custom.html#languageSupport).
      */
     public enum BaseModelName: String {
         case arArBroadbandmodel = "ar-AR_BroadbandModel"
+        case deDeBroadbandmodel = "de-DE_BroadbandModel"
+        case deDeNarrowbandmodel = "de-DE_NarrowbandModel"
         case enGbBroadbandmodel = "en-GB_BroadbandModel"
         case enGbNarrowbandmodel = "en-GB_NarrowbandModel"
         case enUsBroadbandmodel = "en-US_BroadbandModel"
         case enUsNarrowbandmodel = "en-US_NarrowbandModel"
+        case enUsShortformNarrowbandmodel = "en-US_ShortForm_NarrowbandModel"
         case esEsBroadbandmodel = "es-ES_BroadbandModel"
         case esEsNarrowbandmodel = "es-ES_NarrowbandModel"
         case frFrBroadbandmodel = "fr-FR_BroadbandModel"
+        case frFrNarrowbandmodel = "fr-FR_NarrowbandModel"
         case jaJpBroadbandmodel = "ja-JP_BroadbandModel"
         case jaJpNarrowbandmodel = "ja-JP_NarrowbandModel"
         case koKrBroadbandmodel = "ko-KR_BroadbandModel"
@@ -53,9 +57,9 @@ internal struct CreateAcousticModel: Encodable {
 
     /**
      The name of the base language model that is to be customized by the new custom acoustic model. The new custom model
-     can be used only with the base model that it customizes. To determine whether a base model supports acoustic model
-     customization, refer to [Language support for
-     customization](https://console.bluemix.net/docs/services/speech-to-text/custom.html#languageSupport).
+     can be used only with the base model that it customizes.
+     To determine whether a base model supports acoustic model customization, refer to [Language support for
+     customization](https://cloud.ibm.com/docs/services/speech-to-text/custom.html#languageSupport).
      */
     public var baseModelName: String
 
@@ -80,9 +84,9 @@ internal struct CreateAcousticModel: Encodable {
        name that describes the acoustic environment of the custom model, such as `Mobile custom model` or `Noisy car
        custom model`.
      - parameter baseModelName: The name of the base language model that is to be customized by the new custom
-       acoustic model. The new custom model can be used only with the base model that it customizes. To determine
-       whether a base model supports acoustic model customization, refer to [Language support for
-       customization](https://console.bluemix.net/docs/services/speech-to-text/custom.html#languageSupport).
+       acoustic model. The new custom model can be used only with the base model that it customizes.
+       To determine whether a base model supports acoustic model customization, refer to [Language support for
+       customization](https://cloud.ibm.com/docs/services/speech-to-text/custom.html#languageSupport).
      - parameter description: A description of the new custom acoustic model. Use a localized description that
        matches the language of the custom model.
 

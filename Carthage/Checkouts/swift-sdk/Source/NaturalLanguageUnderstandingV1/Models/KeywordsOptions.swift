@@ -17,9 +17,10 @@
 import Foundation
 
 /**
- An option indicating whether or not important keywords from the analyzed content should be returned.
+ Returns important keywords in the content.
+ Supported languages: English, French, German, Italian, Japanese, Korean, Portuguese, Russian, Spanish, Swedish.
  */
-public struct KeywordsOptions: Encodable {
+public struct KeywordsOptions: Codable, Equatable {
 
     /**
      Maximum number of keywords to return.
@@ -27,12 +28,12 @@ public struct KeywordsOptions: Encodable {
     public var limit: Int?
 
     /**
-     Set this to true to return sentiment information for detected keywords.
+     Set this to `true` to return sentiment information for detected keywords.
      */
     public var sentiment: Bool?
 
     /**
-     Set this to true to analyze emotion for detected keywords.
+     Set this to `true` to analyze emotion for detected keywords.
      */
     public var emotion: Bool?
 
@@ -47,8 +48,8 @@ public struct KeywordsOptions: Encodable {
      Initialize a `KeywordsOptions` with member variables.
 
      - parameter limit: Maximum number of keywords to return.
-     - parameter sentiment: Set this to true to return sentiment information for detected keywords.
-     - parameter emotion: Set this to true to analyze emotion for detected keywords.
+     - parameter sentiment: Set this to `true` to return sentiment information for detected keywords.
+     - parameter emotion: Set this to `true` to analyze emotion for detected keywords.
 
      - returns: An initialized `KeywordsOptions`.
     */

@@ -17,15 +17,21 @@
 import Foundation
 
 /** SemanticRolesSubject. */
-public struct SemanticRolesSubject: Decodable {
+public struct SemanticRolesSubject: Codable, Equatable {
 
     /**
      Text that corresponds to the subject role.
      */
     public var text: String?
 
+    /**
+     An array of extracted entities.
+     */
     public var entities: [SemanticRolesEntity]?
 
+    /**
+     An array of extracted keywords.
+     */
     public var keywords: [SemanticRolesKeyword]?
 
     // Map each property name to the key that shall be used for encoding/decoding.

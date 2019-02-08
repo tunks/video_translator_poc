@@ -20,15 +20,15 @@ import Foundation
  The detected anger, disgust, fear, joy, or sadness that is conveyed by the content. Emotion information can be returned
  for detected entities, keywords, or user-specified target phrases found in the text.
  */
-public struct EmotionResult: Decodable {
+public struct EmotionResult: Codable, Equatable {
 
     /**
-     The returned emotion results across the document.
+     Emotion results for the document as a whole.
      */
     public var document: DocumentEmotionResults?
 
     /**
-     The returned emotion results per specified target.
+     Emotion results for specified targets.
      */
     public var targets: [TargetedEmotionResults]?
 

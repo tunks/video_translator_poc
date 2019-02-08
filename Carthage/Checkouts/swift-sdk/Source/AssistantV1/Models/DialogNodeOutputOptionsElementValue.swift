@@ -20,10 +20,10 @@ import Foundation
  An object defining the message input to be sent to the Watson Assistant service if the user selects the corresponding
  option.
  */
-public struct DialogNodeOutputOptionsElementValue: Codable {
+public struct DialogNodeOutputOptionsElementValue: Codable, Equatable {
 
     /**
-     The user input.
+     An input object that includes the input text.
      */
     public var input: InputData?
 
@@ -35,7 +35,7 @@ public struct DialogNodeOutputOptionsElementValue: Codable {
     /**
      Initialize a `DialogNodeOutputOptionsElementValue` with member variables.
 
-     - parameter input: The user input.
+     - parameter input: An input object that includes the input text.
 
      - returns: An initialized `DialogNodeOutputOptionsElementValue`.
     */

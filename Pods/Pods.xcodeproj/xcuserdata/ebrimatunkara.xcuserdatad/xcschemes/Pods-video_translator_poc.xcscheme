@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0940"
+   LastUpgradeVersion = "0930"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3CA75CCC4671A37B357F485433F9C444"
+               BlueprintIdentifier = "51A2BF16295FC8DF442D4AD73AB44D15"
                BuildableName = "Pods_video_translator_poc.framework"
                BlueprintName = "Pods-video_translator_poc"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3CA75CCC4671A37B357F485433F9C444"
+            BlueprintIdentifier = "51A2BF16295FC8DF442D4AD73AB44D15"
             BuildableName = "Pods_video_translator_poc.framework"
             BlueprintName = "Pods-video_translator_poc"
             ReferencedContainer = "container:Pods.xcodeproj">

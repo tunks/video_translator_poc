@@ -18,12 +18,12 @@ import Foundation
 import RestKit
 
 /**
- A response from the Watson Assistant service.
+ The response sent by the workspace, including the output text, detected intents and entities, and context.
  */
-public struct MessageResponse: Decodable {
+public struct MessageResponse: Codable, Equatable {
 
     /**
-     The user input from the request.
+     The text of the user input.
      */
     public var input: MessageInput?
 
@@ -43,14 +43,20 @@ public struct MessageResponse: Decodable {
     public var alternateIntents: Bool?
 
     /**
-     State information for the conversation.
+     State information for the conversation. To maintain state, include the context from the previous response.
      */
     public var context: Context
 
     /**
-     Output from the dialog, including the response to the user, the nodes that were triggered, and log messages.
+     An output object that includes the response to the user, the dialog nodes that were triggered, and messages from
+     the log.
      */
     public var output: OutputData
+
+    /**
+     An array of objects describing any actions requested by the dialog node.
+     */
+    public var actions: [DialogNodeAction]?
 
     /// Additional properties associated with this model.
     public var additionalProperties: [String: JSON]
@@ -63,7 +69,8 @@ public struct MessageResponse: Decodable {
         case alternateIntents = "alternate_intents"
         case context = "context"
         case output = "output"
-        static let allValues = [input, intents, entities, alternateIntents, context, output]
+        case actions = "actions"
+        static let allValues = [input, intents, entities, alternateIntents, context, output, actions]
     }
 
     public init(from decoder: Decoder) throws {
@@ -74,8 +81,22 @@ public struct MessageResponse: Decodable {
         alternateIntents = try container.decodeIfPresent(Bool.self, forKey: .alternateIntents)
         context = try container.decode(Context.self, forKey: .context)
         output = try container.decode(OutputData.self, forKey: .output)
+        actions = try container.decodeIfPresent([DialogNodeAction].self, forKey: .actions)
         let dynamicContainer = try decoder.container(keyedBy: DynamicKeys.self)
         additionalProperties = try dynamicContainer.decode([String: JSON].self, excluding: CodingKeys.allValues)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(input, forKey: .input)
+        try container.encode(intents, forKey: .intents)
+        try container.encode(entities, forKey: .entities)
+        try container.encodeIfPresent(alternateIntents, forKey: .alternateIntents)
+        try container.encode(context, forKey: .context)
+        try container.encode(output, forKey: .output)
+        try container.encodeIfPresent(actions, forKey: .actions)
+        var dynamicContainer = encoder.container(keyedBy: DynamicKeys.self)
+        try dynamicContainer.encodeIfPresent(additionalProperties)
     }
 
 }

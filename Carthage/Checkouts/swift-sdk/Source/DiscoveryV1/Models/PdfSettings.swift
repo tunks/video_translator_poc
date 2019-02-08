@@ -19,9 +19,9 @@ import Foundation
 /**
  A list of PDF conversion settings.
  */
-public struct PdfSettings: Codable {
+public struct PDFSettings: Codable, Equatable {
 
-    public var heading: PdfHeadingDetection?
+    public var heading: PDFHeadingDetection?
 
     // Map each property name to the key that shall be used for encoding/decoding.
     private enum CodingKeys: String, CodingKey {
@@ -29,14 +29,14 @@ public struct PdfSettings: Codable {
     }
 
     /**
-     Initialize a `PdfSettings` with member variables.
+     Initialize a `PDFSettings` with member variables.
 
      - parameter heading:
 
-     - returns: An initialized `PdfSettings`.
+     - returns: An initialized `PDFSettings`.
     */
     public init(
-        heading: PdfHeadingDetection? = nil
+        heading: PDFHeadingDetection? = nil
     )
     {
         self.heading = heading

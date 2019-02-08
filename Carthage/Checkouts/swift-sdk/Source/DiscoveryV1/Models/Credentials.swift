@@ -19,18 +19,20 @@ import Foundation
 /**
  Object containing credential information.
  */
-public struct Credentials: Codable {
+public struct Credentials: Codable, Equatable {
 
     /**
      The source that this credentials object connects to.
      -  `box` indicates the credentials are used to connect an instance of Enterprise Box.
      -  `salesforce` indicates the credentials are used to connect to Salesforce.
      -  `sharepoint` indicates the credentials are used to connect to Microsoft SharePoint Online.
+     -  `web_crawl` indicates the credentials are used to perform a web crawl.
      */
     public enum SourceType: String {
         case box = "box"
         case salesforce = "salesforce"
         case sharepoint = "sharepoint"
+        case webCrawl = "web_crawl"
     }
 
     /**
@@ -43,6 +45,7 @@ public struct Credentials: Codable {
      -  `box` indicates the credentials are used to connect an instance of Enterprise Box.
      -  `salesforce` indicates the credentials are used to connect to Salesforce.
      -  `sharepoint` indicates the credentials are used to connect to Microsoft SharePoint Online.
+     -  `web_crawl` indicates the credentials are used to perform a web crawl.
      */
     public var sourceType: String?
 
@@ -67,6 +70,7 @@ public struct Credentials: Codable {
        -  `box` indicates the credentials are used to connect an instance of Enterprise Box.
        -  `salesforce` indicates the credentials are used to connect to Salesforce.
        -  `sharepoint` indicates the credentials are used to connect to Microsoft SharePoint Online.
+       -  `web_crawl` indicates the credentials are used to perform a web crawl.
      - parameter credentialDetails: Object containing details of the stored credentials.
        Obtain credentials for your source from the administrator of the source.
 

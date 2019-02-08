@@ -24,8 +24,8 @@ import RestKit
  your written communications are perceived and then to improve the tone of your communications. Businesses can use the
  service to learn the tone of their customers' communications and to respond to each customer appropriately, or to
  understand and improve their customer conversations.
- **Note:** Request logging is disabled for the Tone Analyzer service. The service neither logs nor retains data from
- requests and responses, regardless of whether the `X-Watson-Learning-Opt-Out` request header is set.
+ **Note:** Request logging is disabled for the Tone Analyzer service. Regardless of whether you set the
+ `X-Watson-Learning-Opt-Out` request header, the service does not log or retain data from requests and responses.
  */
 public class ToneAnalyzer {
 
@@ -35,10 +35,9 @@ public class ToneAnalyzer {
     /// The default HTTP headers for all requests to the service.
     public var defaultHeaders = [String: String]()
 
-    private let session = URLSession(configuration: URLSessionConfiguration.default)
-    private var authMethod: AuthenticationMethod
-    private let domain = "com.ibm.watson.developer-cloud.ToneAnalyzerV3"
-    private let version: String
+    var session = URLSession(configuration: URLSessionConfiguration.default)
+    var authMethod: AuthenticationMethod
+    let version: String
 
     /**
      Create a `ToneAnalyzer` object.
@@ -49,8 +48,9 @@ public class ToneAnalyzer {
        in "YYYY-MM-DD" format.
      */
     public init(username: String, password: String, version: String) {
-        self.authMethod = BasicAuthentication(username: username, password: password)
+        self.authMethod = Shared.getAuthMethod(username: username, password: password)
         self.version = version
+        Shared.configureRestRequest()
     }
 
     /**
@@ -62,8 +62,9 @@ public class ToneAnalyzer {
      - parameter iamUrl: The URL for the IAM service.
      */
     public init(version: String, apiKey: String, iamUrl: String? = nil) {
+        self.authMethod = Shared.getAuthMethod(apiKey: apiKey, iamURL: iamUrl)
         self.version = version
-        self.authMethod = IAMAuthentication(apiKey: apiKey, url: iamUrl)
+        Shared.configureRestRequest()
     }
 
     /**
@@ -74,8 +75,9 @@ public class ToneAnalyzer {
      - parameter accessToken: An access token for the service.
      */
     public init(version: String, accessToken: String) {
-        self.version = version
         self.authMethod = IAMAccessToken(accessToken: accessToken)
+        self.version = version
+        Shared.configureRestRequest()
     }
 
     public func accessToken(_ newToken: String) {
@@ -85,24 +87,28 @@ public class ToneAnalyzer {
     }
 
     /**
-     If the response or data represents an error returned by the Tone Analyzer service,
-     then return NSError with information about the error that occured. Otherwise, return nil.
+     Use the HTTP response and data received by the Tone Analyzer service to extract
+     information about the error that occurred.
 
-     - parameter data: Raw data returned from the service that may represent an error.
-     - parameter response: the URL response returned from the service.
+     - parameter data: Raw data returned by the service that may represent an error.
+     - parameter response: the URL response returned by the service.
      */
-    private func errorResponseDecoder(data: Data, response: HTTPURLResponse) -> Error {
+    func errorResponseDecoder(data: Data, response: HTTPURLResponse) -> WatsonError {
 
-        let code = response.statusCode
+        let statusCode = response.statusCode
+        var errorMessage: String?
+        var metadata = [String: Any]()
+
         do {
             let json = try JSONDecoder().decode([String: JSON].self, from: data)
-            var userInfo: [String: Any] = [:]
+            metadata = [:]
             if case let .some(.string(message)) = json["error"] {
-                userInfo[NSLocalizedDescriptionKey] = message
+                errorMessage = message
             }
-            return NSError(domain: domain, code: code, userInfo: userInfo)
+            // If metadata is empty, it should show up as nil in the WatsonError
+            return WatsonError.http(statusCode: statusCode, message: errorMessage, metadata: !metadata.isEmpty ? metadata : nil)
         } catch {
-            return NSError(domain: domain, code: code, userInfo: nil)
+            return WatsonError.http(statusCode: statusCode, message: nil, metadata: nil)
         }
     }
 
@@ -120,17 +126,14 @@ public class ToneAnalyzer {
      set). When specifying a content type of plain text or HTML, include the `charset` parameter to indicate the
      character encoding of the input text; for example: `Content-Type: text/plain;charset=utf-8`. For `text/html`, the
      service removes HTML tags and analyzes only the textual content.
+     **See also:** [Using the general-purpose
+     endpoint](https://cloud.ibm.com/docs/services/tone-analyzer/using-tone.html#using-the-general-purpose-endpoint).
 
      - parameter toneContent: JSON, plain text, or HTML input that contains the content to be analyzed. For JSON
        input, provide an object of type `ToneInput`.
      - parameter sentences: Indicates whether the service is to return an analysis of each individual sentence in
        addition to its analysis of the full document. If `true` (the default), the service returns results for each
        sentence.
-     - parameter tones: **`2017-09-21`:** Deprecated. The service continues to accept the parameter for
-       backward-compatibility, but the parameter no longer affects the response.
-       **`2016-05-19`:** A comma-separated list of tones for which the service is to return its analysis of the input;
-       the indicated tones apply both to the full document and to individual sentences of the document. You can specify
-       one or more of the valid values. Omit the parameter to request results for all three tones.
      - parameter contentLanguage: The language of the input text for the request: English or French. Regional variants
        are treated as their parent language; for example, `en-US` is interpreted as `en`. The input content must match
        the specified language. Do not submit content that contains both languages. You can use different languages for
@@ -141,22 +144,19 @@ public class ToneAnalyzer {
        are treated as their parent language; for example, `en-US` is interpreted as `en`. You can use different
        languages for **Content-Language** and **Accept-Language**.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func tone(
         toneContent: ToneContent,
         sentences: Bool? = nil,
-        tones: [String]? = nil,
         contentLanguage: String? = nil,
         acceptLanguage: String? = nil,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (ToneAnalysis) -> Void)
+        completionHandler: @escaping (WatsonResponse<ToneAnalysis>?, WatsonError?) -> Void)
     {
         // construct body
         guard let body = toneContent.content else {
-            failure?(RestError.serializationError)
+            completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
 
@@ -181,10 +181,6 @@ public class ToneAnalyzer {
             let queryParameter = URLQueryItem(name: "sentences", value: "\(sentences)")
             queryParameters.append(queryParameter)
         }
-        if let tones = tones {
-            let queryParameter = URLQueryItem(name: "tones", value: tones.joined(separator: ","))
-            queryParameters.append(queryParameter)
-        }
 
         // construct REST request
         let request = RestRequest(
@@ -199,13 +195,7 @@ public class ToneAnalyzer {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<ToneAnalysis>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.responseObject(completionHandler: completionHandler)
     }
 
     /**
@@ -217,8 +207,10 @@ public class ToneAnalyzer {
      If you submit more than 50 utterances, the service returns a warning for the overall content and analyzes only the
      first 50 utterances. If you submit a single utterance that contains more than 500 characters, the service returns
      an error for that utterance and does not analyze the utterance. The request fails if all utterances have more than
-     500 characters.
-     Per the JSON specification, the default character encoding for JSON content is effectively always UTF-8.
+     500 characters. Per the JSON specification, the default character encoding for JSON content is effectively always
+     UTF-8.
+     **See also:** [Using the customer-engagement
+     endpoint](https://cloud.ibm.com/docs/services/tone-analyzer/using-tone-chat.html#using-the-customer-engagement-endpoint).
 
      - parameter utterances: An array of `Utterance` objects that provides the input content that the service is to
        analyze.
@@ -232,21 +224,20 @@ public class ToneAnalyzer {
        are treated as their parent language; for example, `en-US` is interpreted as `en`. You can use different
        languages for **Content-Language** and **Accept-Language**.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func toneChat(
         utterances: [Utterance],
         contentLanguage: String? = nil,
         acceptLanguage: String? = nil,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (UtteranceAnalyses) -> Void)
+        completionHandler: @escaping (WatsonResponse<UtteranceAnalyses>?, WatsonError?) -> Void)
     {
         // construct body
-        let toneChatRequest = ToneChatInput(utterances: utterances)
+        let toneChatRequest = ToneChatInput(
+            utterances: utterances)
         guard let body = try? JSONEncoder().encode(toneChatRequest) else {
-            failure?(RestError.serializationError)
+            completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
 
@@ -281,62 +272,7 @@ public class ToneAnalyzer {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<UtteranceAnalyses>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
-    }
-
-}
-
-extension ToneAnalyzer {
-
-    @available(*, deprecated, message: "This method has been deprecated in favor of the tone method that accepts a toneContent parameter.  This method will be removed in a future release.")
-    public func tone(
-        toneInput: ToneInput,
-        sentences: Bool? = nil,
-        tones: [String]? = nil,
-        contentLanguage: String? = nil,
-        acceptLanguage: String? = nil,
-        headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (ToneAnalysis) -> Void)
-    {
-        tone(toneContent: .toneInput(toneInput), sentences: sentences, tones: tones, contentLanguage: contentLanguage,
-             acceptLanguage: acceptLanguage, headers: headers, failure: failure, success: success)
-    }
-
-    @available(*, deprecated, message: "This method has been deprecated in favor of the tone method that accepts a toneContent parameter.  This method will be removed in a future release.")
-    public func tone(
-        text: String,
-        sentences: Bool? = nil,
-        tones: [String]? = nil,
-        contentLanguage: String? = nil,
-        acceptLanguage: String? = nil,
-        headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (ToneAnalysis) -> Void)
-    {
-        tone(toneContent: .text(text), sentences: sentences, tones: tones, contentLanguage: contentLanguage,
-             acceptLanguage: acceptLanguage, headers: headers, failure: failure, success: success)
-    }
-
-    @available(*, deprecated, message: "This method has been deprecated in favor of the tone method that accepts a toneContent parameter.  This method will be removed in a future release.")
-    public func tone(
-        html: String,
-        sentences: Bool? = nil,
-        tones: [String]? = nil,
-        contentLanguage: String? = nil,
-        acceptLanguage: String? = nil,
-        headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (ToneAnalysis) -> Void)
-    {
-        tone(toneContent: .html(html), sentences: sentences, tones: tones, contentLanguage: contentLanguage,
-             acceptLanguage: acceptLanguage, headers: headers, failure: failure, success: success)
+        request.responseObject(completionHandler: completionHandler)
     }
 
 }

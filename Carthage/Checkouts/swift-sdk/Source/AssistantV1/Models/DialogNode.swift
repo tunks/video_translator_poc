@@ -18,7 +18,7 @@ import Foundation
 import RestKit
 
 /** DialogNode. */
-public struct DialogNode: Decodable {
+public struct DialogNode: Codable, Equatable {
 
     /**
      How the dialog node is processed.
@@ -60,9 +60,9 @@ public struct DialogNode: Decodable {
      Whether this dialog node can be returned to after a digression.
      */
     public enum DigressOut: String {
-        case returning = "allow_returning"
-        case all = "allow_all"
-        case allNeverReturn = "allow_all_never_return"
+        case allowReturning = "allow_returning"
+        case allowAll = "allow_all"
+        case allowAllNeverReturn = "allow_all_never_return"
     }
 
     /**
@@ -102,7 +102,7 @@ public struct DialogNode: Decodable {
 
     /**
      The output of the dialog node. For more information about how to specify dialog node output, see the
-     [documentation](https://console.bluemix.net/docs/services/conversation/dialog-overview.html#complex).
+     [documentation](https://cloud.ibm.com/docs/services/assistant/dialog-overview.html#complex).
      */
     public var output: DialogNodeOutput?
 
@@ -124,12 +124,12 @@ public struct DialogNode: Decodable {
     /**
      The timestamp for creation of the dialog node.
      */
-    public var created: String?
+    public var created: Date?
 
     /**
      The timestamp for the most recent update to the dialog node.
      */
-    public var updated: String?
+    public var updated: Date?
 
     /**
      The actions for the dialog node.
@@ -140,6 +140,11 @@ public struct DialogNode: Decodable {
      The alias used to identify the dialog node.
      */
     public var title: String?
+
+    /**
+     For internal use only.
+     */
+    public var disabled: Bool?
 
     /**
      How the dialog node is processed.
@@ -172,7 +177,8 @@ public struct DialogNode: Decodable {
     public var digressOutSlots: String?
 
     /**
-     A label that can be displayed externally to describe the purpose of the node to users.
+     A label that can be displayed externally to describe the purpose of the node to users. This string must be no
+     longer than 512 characters.
      */
     public var userLabel: String?
 
@@ -191,6 +197,7 @@ public struct DialogNode: Decodable {
         case updated = "updated"
         case actions = "actions"
         case title = "title"
+        case disabled = "disabled"
         case nodeType = "type"
         case eventName = "event_name"
         case variable = "variable"

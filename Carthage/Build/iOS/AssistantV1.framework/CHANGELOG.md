@@ -1,5 +1,195 @@
+## [1.3.1](https://github.com/watson-developer-cloud/swift-sdk/compare/1.3.0...1.3.1) (2019-01-18)
+
+
+### Bug Fixes
+
+* **SpeechToTextV1:** Fix grammarName and redaction parameters in recognize websocket methods ([64b116c](https://github.com/watson-developer-cloud/swift-sdk/commit/64b116c))
+
+# [1.3.0](https://github.com/watson-developer-cloud/swift-sdk/compare/1.2.0...1.3.0) (2019-01-18)
+
+
+### Bug Fixes
+
+* **SpeechToTextV1:** Change contentType parameter to optional in certain methods ([e033cff](https://github.com/watson-developer-cloud/swift-sdk/commit/e033cff))
+
+
+### Features
+
+* **DiscoveryV1:** Add support for custom stopword lists ([915ce68](https://github.com/watson-developer-cloud/swift-sdk/commit/915ce68))
+* **DiscoveryV1:** Add support for gateways ([39393fa](https://github.com/watson-developer-cloud/swift-sdk/commit/39393fa))
+* **DiscoveryV1:** Add web crawlers to the list of possible sources ([5a4a62e](https://github.com/watson-developer-cloud/swift-sdk/commit/5a4a62e))
+* **SpeechToTextV1:** Add new options to acoustic models and language models ([3345b46](https://github.com/watson-developer-cloud/swift-sdk/commit/3345b46))
+* **SpeechToTextV1:** Add the ability to specify grammars in recognition requests ([7edcdf4](https://github.com/watson-developer-cloud/swift-sdk/commit/7edcdf4))
+* **VisualRecognitionV3:** Add acceptLanguage parameter to detectFaces() ([a260a9c](https://github.com/watson-developer-cloud/swift-sdk/commit/a260a9c))
+* **VisualRecognitionV3:** Add genderLabel property to FaceGender model ([a00f3c6](https://github.com/watson-developer-cloud/swift-sdk/commit/a00f3c6))
+
+# [1.2.0](https://github.com/watson-developer-cloud/swift-sdk/compare/1.1.1...1.2.0) (2019-01-11)
+
+
+### Bug Fixes
+
+* **CompareComplyV1:** Change Location properties to optional ([2e66ac5](https://github.com/watson-developer-cloud/swift-sdk/commit/2e66ac5))
+* **CompareComplyV1:** Fix incorrect parameter types ([4cfa292](https://github.com/watson-developer-cloud/swift-sdk/commit/4cfa292))
+* **CompareComplyV1:** Give more appropriate types to model properties ([4b1af08](https://github.com/watson-developer-cloud/swift-sdk/commit/4b1af08))
+
+
+### Features
+
+* **CompareComplyV1:** Add properties to AlignedElements and Attribute ([0fbeb6d](https://github.com/watson-developer-cloud/swift-sdk/commit/0fbeb6d))
+* **CompareComplyV1:** New framework for Compare & Comply service ([482444a](https://github.com/watson-developer-cloud/swift-sdk/commit/482444a))
+
+# [1.1.1](https://github.com/watson-developer-cloud/swift-sdk/compare/1.1.0...1.1.1) (2019-01-10)
+
+
+### Bug Fixes
+
+* **AssistantV1:** Add missing "disabled" field to DialogNode ([e45de83](https://github.com/watson-developer-cloud/swift-sdk/commit/e45de83))
+* **AssistantV2:** Add missing userDefined field to MessageOutput ([f65cafc](https://github.com/watson-developer-cloud/swift-sdk/commit/f65cafc))
+
+# [1.1.0](https://github.com/watson-developer-cloud/swift-sdk/compare/1.0.0...1.1.0) (2018-12-11)
+
+
+### Features
+
+* **AssistantV1:** Add metadata field to Context model ([13a90c1](https://github.com/watson-developer-cloud/swift-sdk/commit/13a90c1))
+* **AssistantV1:** Add option to sort results in getWorkspace() ([5cefc7b](https://github.com/watson-developer-cloud/swift-sdk/commit/5cefc7b))
+* **DiscoveryV1:** Add new concepts property to NluEnrichmentFeatures model ([80258db](https://github.com/watson-developer-cloud/swift-sdk/commit/80258db))
+* **DiscoveryV1:** Add retrievalDetails property to QueryResponse model ([631affc](https://github.com/watson-developer-cloud/swift-sdk/commit/631affc))
+* **NaturalLanguageUnderstandingV1:** Add 4 new properties to the Model model ([53fe057](https://github.com/watson-developer-cloud/swift-sdk/commit/53fe057))
+* **NaturalLanguageUnderstandingV1:** Add new count property to KeywordsResult model ([ab9a339](https://github.com/watson-developer-cloud/swift-sdk/commit/ab9a339))
+* **NaturalLanguageUnderstandingV1:** Add new limit property to CategoriesOptions model ([5bf6637](https://github.com/watson-developer-cloud/swift-sdk/commit/5bf6637))
+
+# [1.0.0](https://github.com/watson-developer-cloud/swift-sdk/compare/0.38.1...1.0.0) (2018-12-06)
+
+
+### All Services
+- `failure` and `success` callbacks are replaced with a single `completionHandler` of type `(WatsonResponse<T>?, WatsonError?) -> Void`
+- New `WatsonResponse` type in the completion handlers that contains the response HTTP status, headers, and data
+- New `WatsonError` type in the completion handlers that contains more useful and detailed information about the error that occurred
+- Change the type of date-time properties from `String` to `Date`
+- Remove all deprecated types, methods, and properties
+- All parameters now get passed directly to methods rather than packaging them up in the `properties` parameter
+- All models are now `Codable`, instead of only being `Encodable` or `Decodable`, so they can be converted both to and from JSON
+- All models are now `Equatable`
+
+
+### ConversationV1
+- REMOVED - use AssistantV1 instead
+
+
+### LanguageTranslatorV2
+- REMOVED - use LanguageTranslatorV3 instead
+
+
+### NaturalLanguageUnderstandingV1
+- Remove `additionalProperties` property from `CategoriesOptions` and `MetadataOptions`
+
+
+### SpeechToTextV1
+- The `tokenURL` and `websocketsURL` properties are no longer public. Setting the `serviceURL` will automatically update the other two URLs appropriately.
+- Add missing parameters `baseModelVersion`, `languageCustomizationID`, and `customerID` to the following methods:
+    - `recognize()` (using an audio file)
+    - `recognizeUsingWebsocket()`
+    - `recognizeMicrophone()`
+    - `SpeechToTextSession()` initializers
+
+
+### VisualRecognitionV3
+- Remove `PositiveExample` model. All parameters that used that model are now of type `[String: URL]`
+- Change the following properties from optional to nonoptional
+    - `ClassResult.score`
+    - `DetectedFaces.imagesProcessed`
+    - `FaceAge.score`
+    - `FaceGender.score`
+
+
+## [0.38.1](https://github.com/watson-developer-cloud/swift-sdk/compare/0.38.0...0.38.1) (2018-11-13)
+
+
+### Bug Fixes
+
+* **SpeechToTextV1:** Update recognizeMicrophone() to work with any authentication method ([5701ba6](https://github.com/watson-developer-cloud/swift-sdk/commit/5701ba6))
+
+# [0.38.0](https://github.com/watson-developer-cloud/swift-sdk/compare/0.37.0...0.38.0) (2018-11-12)
+
+
+### Bug Fixes
+
+* **VisualRecognitionV3:** temporary workaround for new A12 based devices ([62edd09](https://github.com/watson-developer-cloud/swift-sdk/commit/62edd09))
+* **VisualRecognitionV3:** temporary workaround to support A12 devices for Core ML inference ([fa212ec](https://github.com/watson-developer-cloud/swift-sdk/commit/fa212ec))
+
+
+### Features
+
+* **All:** Add support for Swift 4.2 ([4bbf42b](https://github.com/watson-developer-cloud/swift-sdk/commit/4bbf42b))
+
+# [0.37.0](https://github.com/watson-developer-cloud/swift-sdk/compare/0.36.0...0.37.0) (2018-11-02)
+
+
+### Features
+
+* **AssistantV1, AssistantV2:** Add cloudFunction and webAction to DialogNodeAction.ActionType ([16d3fc9](https://github.com/watson-developer-cloud/swift-sdk/commit/16d3fc9))
+* **DiscoveryV1:** Tokenization dictionaries for collections ([d274371](https://github.com/watson-developer-cloud/swift-sdk/commit/d274371))
+* **SpeechToTextV1:** Add languageCustomizationID parameter to createJob() and recognize() ([0137964](https://github.com/watson-developer-cloud/swift-sdk/commit/0137964))
+
+# [0.36.0](https://github.com/watson-developer-cloud/swift-sdk/compare/0.35.0...0.36.0) (2018-10-19)
+
+
+### Bug Fixes
+
+* **Visual Recognition:** Fix deserialization error in getCoreMlModel ([9392b23](https://github.com/watson-developer-cloud/swift-sdk/commit/9392b23))
+* Conversion of file data to multipart form data ([1d46baf](https://github.com/watson-developer-cloud/swift-sdk/commit/1d46baf))
+
+
+### Features
+
+* **Discovery:** Add "LT" option to environment sizes ([f92fcde](https://github.com/watson-developer-cloud/swift-sdk/commit/f92fcde))
+* **Discovery:** Add `size` parameter to updateEnvironment method ([725e1d5](https://github.com/watson-developer-cloud/swift-sdk/commit/725e1d5))
+* **Discovery:** Add bias and loggingOptOut parameters to query methods ([8782fc6](https://github.com/watson-developer-cloud/swift-sdk/commit/8782fc6))
+* **Discovery:** Add requestedSize and searchStatus properties to Environment model ([14cdb02](https://github.com/watson-developer-cloud/swift-sdk/commit/14cdb02))
+* **ToneAnalyzer:** Add `ToneID` options to `ToneChatScore` ([ac75c92](https://github.com/watson-developer-cloud/swift-sdk/commit/ac75c92))
+
+
+### Reverts
+
+* **AssistantV1:** Revert erroneous addition of `actions` property to `OutputData` ([28efe1e](https://github.com/watson-developer-cloud/swift-sdk/commit/28efe1e))
+* **Linux:** Remove 30 minute wait from Linux tests ([1b4d734](https://github.com/watson-developer-cloud/swift-sdk/commit/1b4d734))
+
 Change Log
 ==========
+
+## Version 0.35.0
+_2018-09-25_
+
+This release adds the new AssistantV2 service.
+
+## Version 0.34.0
+_2018-09-14_
+
+This release regenerates all services with documentation updates, adds support for IBM Cloud Private authentication, and adds a couple of new properties to Speech to Text and Assistant/Conversation.
+
+This release includes the following new features:
+
+- All services: Adds support for authentication with IBM Cloud Private (ICP) API keys. Use the `init(username:password:)` initializer, passing `apikey` for the `username` parameter and the API key for the `password`.
+- Speech to Text: Adds the language models `de-DE_BroadbandModel`, `pt-BR_BroadbandModel`, and `pt-BR_NarrowbandModel`
+- Assistant/Conversation: Add the `actions` property to `MessageResponse` and `OutputData`
+
+## Version 0.33.1
+
+Internal bug fix regarding RestKit.framework. This should have no impact on users.
+
+## Version 0.33.0
+_2018-08-31_
+
+### First release that supports Cocoapods!
+
+This release adds support for installing each service in the Swift SDK via Cocoapods. It also adds new options to the Speech to Text `recognize` API, and includes documentation improvements.
+
+- Support for Cocoapods!
+- Speech to Text: Adds the `acousticCustomizationID` and `headers` parameters to the `recognize()` method
+- Speech to Text: Adds the `customizationWeight` property to `RecognitionSettings`
+- Documentation: Split README into multiple READMEs: one main README plus one README for each service
+- Documentation: Improved [Jazzy docs](http://watson-developer-cloud.github.io/swift-sdk/)
 
 ## Version 0.32.0
 _2018-08-16_

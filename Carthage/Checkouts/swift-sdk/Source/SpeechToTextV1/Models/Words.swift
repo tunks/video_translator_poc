@@ -17,11 +17,11 @@
 import Foundation
 
 /** Words. */
-public struct Words: Decodable {
+public struct Words: Codable, Equatable {
 
     /**
-     An array of objects that provides information about each word in the custom model's words resource. The array is
-     empty if the custom model has no words.
+     An array of `Word` objects that provides information about each word in the custom model's words resource. The
+     array is empty if the custom model has no words.
      */
     public var words: [Word]
 

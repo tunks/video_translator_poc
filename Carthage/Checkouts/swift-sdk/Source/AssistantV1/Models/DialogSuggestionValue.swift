@@ -20,10 +20,10 @@ import Foundation
  An object defining the message input, intents, and entities to be sent to the Watson Assistant service if the user
  selects the corresponding disambiguation option.
  */
-public struct DialogSuggestionValue: Codable {
+public struct DialogSuggestionValue: Codable, Equatable {
 
     /**
-     The user input.
+     An input object that includes the input text.
      */
     public var input: InputData?
 
@@ -47,7 +47,7 @@ public struct DialogSuggestionValue: Codable {
     /**
      Initialize a `DialogSuggestionValue` with member variables.
 
-     - parameter input: The user input.
+     - parameter input: An input object that includes the input text.
      - parameter intents: An array of intents to be sent along with the user input.
      - parameter entities: An array of entities to be sent along with the user input.
 

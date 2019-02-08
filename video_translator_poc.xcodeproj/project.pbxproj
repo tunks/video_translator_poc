@@ -38,9 +38,9 @@
 		049D4AD8212EE81C00668DC0 /* AudioDataConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D4AD7212EE81C00668DC0 /* AudioDataConverter.swift */; };
 		049D4ADC212EEA0000668DC0 /* MyAudioTabProcessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 049D4ADB212EEA0000668DC0 /* MyAudioTabProcessor.m */; };
 		049D4AE6212EED8C00668DC0 /* LanguageTranslator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D4AE5212EED8C00668DC0 /* LanguageTranslator.swift */; };
-		30C00439087545AF929E2265 /* Pods_video_translator_pocTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D20993C6C220C7014ED0911 /* Pods_video_translator_pocTests.framework */; };
-		93C18843C3E4D726CF69A91C /* Pods_video_translator_pocUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00CCA2D3E6C242E65D7C308D /* Pods_video_translator_pocUITests.framework */; };
-		94ED8AF3CC4803814BF6FC90 /* Pods_video_translator_poc.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38D145888D686B6555FA2DB2 /* Pods_video_translator_poc.framework */; };
+		0646D07333DEDE91328DE4EF /* Pods_video_translator_pocTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E479EFEDCF527BF43C7221E7 /* Pods_video_translator_pocTests.framework */; };
+		434E36C64DFA1D3325AF8505 /* Pods_video_translator_pocUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 75D68CEC6837FA77EEDE8614 /* Pods_video_translator_pocUITests.framework */; };
+		D6892E993830065B6F6612BE /* Pods_video_translator_poc.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32457E5E8D34B9385F7C21F0 /* Pods_video_translator_poc.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,7 +79,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		00CCA2D3E6C242E65D7C308D /* Pods_video_translator_pocUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_video_translator_pocUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		04160CCB2131BB0B00788138 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		0493A8F9212DC82900125F9D /* video_translator_poc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = video_translator_poc.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0493A8FC212DC82900125F9D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -115,14 +114,15 @@
 		049D4AE3212EEB5200668DC0 /* TextToSpeechV1.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TextToSpeechV1.framework; path = Carthage/Build/iOS/TextToSpeechV1.framework; sourceTree = "<group>"; };
 		049D4AE5212EED8C00668DC0 /* LanguageTranslator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageTranslator.swift; sourceTree = "<group>"; };
 		04BDB7F4212EFA4900136C22 /* RestKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RestKit.framework; path = Carthage/Build/iOS/RestKit.framework; sourceTree = "<group>"; };
-		14DDEE498E5652FD404EA928 /* Pods-video_translator_pocUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-video_translator_pocUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-video_translator_pocUITests/Pods-video_translator_pocUITests.debug.xcconfig"; sourceTree = "<group>"; };
-		30819628885F0F11910AA07F /* Pods-video_translator_poc.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-video_translator_poc.debug.xcconfig"; path = "Pods/Target Support Files/Pods-video_translator_poc/Pods-video_translator_poc.debug.xcconfig"; sourceTree = "<group>"; };
-		38D145888D686B6555FA2DB2 /* Pods_video_translator_poc.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_video_translator_poc.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		61CCA1FA2869741111953304 /* Pods-video_translator_pocTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-video_translator_pocTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-video_translator_pocTests/Pods-video_translator_pocTests.release.xcconfig"; sourceTree = "<group>"; };
-		715469E509174E37AFD5C7D7 /* Pods-video_translator_poc.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-video_translator_poc.release.xcconfig"; path = "Pods/Target Support Files/Pods-video_translator_poc/Pods-video_translator_poc.release.xcconfig"; sourceTree = "<group>"; };
-		7D20993C6C220C7014ED0911 /* Pods_video_translator_pocTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_video_translator_pocTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		BE12B898486A948FB7362E34 /* Pods-video_translator_pocUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-video_translator_pocUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-video_translator_pocUITests/Pods-video_translator_pocUITests.release.xcconfig"; sourceTree = "<group>"; };
-		E88E33A41C7C70BDE9A5F1E4 /* Pods-video_translator_pocTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-video_translator_pocTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-video_translator_pocTests/Pods-video_translator_pocTests.debug.xcconfig"; sourceTree = "<group>"; };
+		32457E5E8D34B9385F7C21F0 /* Pods_video_translator_poc.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_video_translator_poc.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		56657A8D4E0BF4EBF30DE063 /* Pods-video_translator_poc.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-video_translator_poc.release.xcconfig"; path = "Target Support Files/Pods-video_translator_poc/Pods-video_translator_poc.release.xcconfig"; sourceTree = "<group>"; };
+		5AA690A01426B2A475D43659 /* Pods-video_translator_pocTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-video_translator_pocTests.debug.xcconfig"; path = "Target Support Files/Pods-video_translator_pocTests/Pods-video_translator_pocTests.debug.xcconfig"; sourceTree = "<group>"; };
+		75D68CEC6837FA77EEDE8614 /* Pods_video_translator_pocUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_video_translator_pocUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		962A4AA2BF4BBB2EDF98357C /* Pods-video_translator_pocUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-video_translator_pocUITests.release.xcconfig"; path = "Target Support Files/Pods-video_translator_pocUITests/Pods-video_translator_pocUITests.release.xcconfig"; sourceTree = "<group>"; };
+		A5D358BFCF6AEDFE7FD9FCD4 /* Pods-video_translator_pocUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-video_translator_pocUITests.debug.xcconfig"; path = "Target Support Files/Pods-video_translator_pocUITests/Pods-video_translator_pocUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		E479EFEDCF527BF43C7221E7 /* Pods_video_translator_pocTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_video_translator_pocTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E5FD413DFB18525C53D3BDA6 /* Pods-video_translator_poc.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-video_translator_poc.debug.xcconfig"; path = "Target Support Files/Pods-video_translator_poc/Pods-video_translator_poc.debug.xcconfig"; sourceTree = "<group>"; };
+		F1DAFD7BEF11D9A9036DCBFE /* Pods-video_translator_pocTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-video_translator_pocTests.release.xcconfig"; path = "Target Support Files/Pods-video_translator_pocTests/Pods-video_translator_pocTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,7 +137,7 @@
 				049D4AC0212E2F6000668DC0 /* VGPlayer.framework in Frameworks */,
 				0425737E212F0A9400270462 /* Starscream.framework in Frameworks */,
 				0425737C212F0A9400270462 /* LanguageTranslatorV3.framework in Frameworks */,
-				94ED8AF3CC4803814BF6FC90 /* Pods_video_translator_poc.framework in Frameworks */,
+				D6892E993830065B6F6612BE /* Pods_video_translator_poc.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,7 +145,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30C00439087545AF929E2265 /* Pods_video_translator_pocTests.framework in Frameworks */,
+				0646D07333DEDE91328DE4EF /* Pods_video_translator_pocTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -153,7 +153,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				93C18843C3E4D726CF69A91C /* Pods_video_translator_pocUITests.framework in Frameworks */,
+				434E36C64DFA1D3325AF8505 /* Pods_video_translator_pocUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -168,8 +168,8 @@
 				0493A910212DC82B00125F9D /* video_translator_pocTests */,
 				0493A91B212DC82B00125F9D /* video_translator_pocUITests */,
 				0493A8FA212DC82900125F9D /* Products */,
-				0E3E63DB2488385A98285C01 /* Pods */,
 				F0C2A1899DF18ED9CEFF9C67 /* Frameworks */,
+				2837BB651E22969322AA9C79 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -243,17 +243,17 @@
 			path = speech;
 			sourceTree = "<group>";
 		};
-		0E3E63DB2488385A98285C01 /* Pods */ = {
+		2837BB651E22969322AA9C79 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				30819628885F0F11910AA07F /* Pods-video_translator_poc.debug.xcconfig */,
-				715469E509174E37AFD5C7D7 /* Pods-video_translator_poc.release.xcconfig */,
-				E88E33A41C7C70BDE9A5F1E4 /* Pods-video_translator_pocTests.debug.xcconfig */,
-				61CCA1FA2869741111953304 /* Pods-video_translator_pocTests.release.xcconfig */,
-				14DDEE498E5652FD404EA928 /* Pods-video_translator_pocUITests.debug.xcconfig */,
-				BE12B898486A948FB7362E34 /* Pods-video_translator_pocUITests.release.xcconfig */,
+				E5FD413DFB18525C53D3BDA6 /* Pods-video_translator_poc.debug.xcconfig */,
+				56657A8D4E0BF4EBF30DE063 /* Pods-video_translator_poc.release.xcconfig */,
+				5AA690A01426B2A475D43659 /* Pods-video_translator_pocTests.debug.xcconfig */,
+				F1DAFD7BEF11D9A9036DCBFE /* Pods-video_translator_pocTests.release.xcconfig */,
+				A5D358BFCF6AEDFE7FD9FCD4 /* Pods-video_translator_pocUITests.debug.xcconfig */,
+				962A4AA2BF4BBB2EDF98357C /* Pods-video_translator_pocUITests.release.xcconfig */,
 			);
-			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 		F0C2A1899DF18ED9CEFF9C67 /* Frameworks */ = {
@@ -267,9 +267,9 @@
 				049D4AC3212EB79600668DC0 /* DropDown.framework */,
 				049D4AC1212E2F6400668DC0 /* SnapKit.framework */,
 				049D4ABF212E2F6000668DC0 /* VGPlayer.framework */,
-				38D145888D686B6555FA2DB2 /* Pods_video_translator_poc.framework */,
-				7D20993C6C220C7014ED0911 /* Pods_video_translator_pocTests.framework */,
-				00CCA2D3E6C242E65D7C308D /* Pods_video_translator_pocUITests.framework */,
+				32457E5E8D34B9385F7C21F0 /* Pods_video_translator_poc.framework */,
+				E479EFEDCF527BF43C7221E7 /* Pods_video_translator_pocTests.framework */,
+				75D68CEC6837FA77EEDE8614 /* Pods_video_translator_pocUITests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -281,12 +281,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0493A921212DC82B00125F9D /* Build configuration list for PBXNativeTarget "video_translator_poc" */;
 			buildPhases = (
-				ADBB9DC7F6FCBD87DA9D9226 /* [CP] Check Pods Manifest.lock */,
+				60D0160EE5B0444124259BB7 /* [CP] Check Pods Manifest.lock */,
 				0493A8F5212DC82900125F9D /* Sources */,
 				0493A8F6212DC82900125F9D /* Frameworks */,
 				0493A8F7212DC82900125F9D /* Resources */,
-				5273A3B4CB9EC97B88269774 /* [CP] Embed Pods Frameworks */,
 				04257380212F0A9400270462 /* Embed Frameworks */,
+				61A26EF97F7676D8ECCA4488 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -301,7 +301,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0493A924212DC82B00125F9D /* Build configuration list for PBXNativeTarget "video_translator_pocTests" */;
 			buildPhases = (
-				5CF20133521F6796EF84FCA7 /* [CP] Check Pods Manifest.lock */,
+				BABF8D03C04B09B52691ADD6 /* [CP] Check Pods Manifest.lock */,
 				0493A909212DC82B00125F9D /* Sources */,
 				0493A90A212DC82B00125F9D /* Frameworks */,
 				0493A90B212DC82B00125F9D /* Resources */,
@@ -320,7 +320,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0493A927212DC82B00125F9D /* Build configuration list for PBXNativeTarget "video_translator_pocUITests" */;
 			buildPhases = (
-				0F1F09A2F50FB1F5FF3C466F /* [CP] Check Pods Manifest.lock */,
+				FFF82B0A4CA4E2B15793AD5F /* [CP] Check Pods Manifest.lock */,
 				0493A914212DC82B00125F9D /* Sources */,
 				0493A915212DC82B00125F9D /* Frameworks */,
 				0493A916212DC82B00125F9D /* Resources */,
@@ -347,14 +347,16 @@
 				TargetAttributes = {
 					0493A8F8212DC82900125F9D = {
 						CreatedOnToolsVersion = 9.4.1;
-						LastSwiftMigration = 0940;
+						LastSwiftMigration = 1010;
 					};
 					0493A90C212DC82B00125F9D = {
 						CreatedOnToolsVersion = 9.4.1;
+						LastSwiftMigration = 1010;
 						TestTargetID = 0493A8F8212DC82900125F9D;
 					};
 					0493A917212DC82B00125F9D = {
 						CreatedOnToolsVersion = 9.4.1;
+						LastSwiftMigration = 1010;
 						TestTargetID = 0493A8F8212DC82900125F9D;
 					};
 				};
@@ -408,54 +410,66 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0F1F09A2F50FB1F5FF3C466F /* [CP] Check Pods Manifest.lock */ = {
+		60D0160EE5B0444124259BB7 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			inputFileListPaths = (
 			);
 			inputPaths = (
 				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
 				"${PODS_ROOT}/Manifest.lock",
 			);
 			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-video_translator_pocUITests-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-video_translator_poc-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		5273A3B4CB9EC97B88269774 /* [CP] Embed Pods Frameworks */ = {
+		61A26EF97F7676D8ECCA4488 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
+			inputFileListPaths = (
+			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-video_translator_poc/Pods-video_translator_poc-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-video_translator_poc/Pods-video_translator_poc-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/SnapKit/SnapKit.framework",
 				"${BUILT_PRODUCTS_DIR}/VGPlayer/VGPlayer.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SnapKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VGPlayer.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-video_translator_poc/Pods-video_translator_poc-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-video_translator_poc/Pods-video_translator_poc-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		5CF20133521F6796EF84FCA7 /* [CP] Check Pods Manifest.lock */ = {
+		BABF8D03C04B09B52691ADD6 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			inputFileListPaths = (
 			);
 			inputPaths = (
 				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
 				"${PODS_ROOT}/Manifest.lock",
 			);
 			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
 			outputPaths = (
 				"$(DERIVED_FILE_DIR)/Pods-video_translator_pocTests-checkManifestLockResult.txt",
 			);
@@ -464,18 +478,22 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		ADBB9DC7F6FCBD87DA9D9226 /* [CP] Check Pods Manifest.lock */ = {
+		FFF82B0A4CA4E2B15793AD5F /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			inputFileListPaths = (
 			);
 			inputPaths = (
 				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
 				"${PODS_ROOT}/Manifest.lock",
 			);
 			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-video_translator_poc-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-video_translator_pocUITests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -674,7 +692,7 @@
 		};
 		0493A922212DC82B00125F9D /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 30819628885F0F11910AA07F /* Pods-video_translator_poc.debug.xcconfig */;
+			baseConfigurationReference = E5FD413DFB18525C53D3BDA6 /* Pods-video_translator_poc.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -685,6 +703,7 @@
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				INFOPLIST_FILE = video_translator_poc/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -693,14 +712,14 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "video_translator_poc/speech/video_translator_poc-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
 		0493A923212DC82B00125F9D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 715469E509174E37AFD5C7D7 /* Pods-video_translator_poc.release.xcconfig */;
+			baseConfigurationReference = 56657A8D4E0BF4EBF30DE063 /* Pods-video_translator_poc.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -711,6 +730,7 @@
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				INFOPLIST_FILE = video_translator_poc/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -718,14 +738,14 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "dev.tunks.video-translator-poc";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "video_translator_poc/speech/video_translator_poc-Bridging-Header.h";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
 		0493A925212DC82B00125F9D /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E88E33A41C7C70BDE9A5F1E4 /* Pods-video_translator_pocTests.debug.xcconfig */;
+			baseConfigurationReference = 5AA690A01426B2A475D43659 /* Pods-video_translator_pocTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -739,7 +759,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "dev.tunks.video-translator-pocTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/video_translator_poc.app/video_translator_poc";
 			};
@@ -747,7 +767,7 @@
 		};
 		0493A926212DC82B00125F9D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 61CCA1FA2869741111953304 /* Pods-video_translator_pocTests.release.xcconfig */;
+			baseConfigurationReference = F1DAFD7BEF11D9A9036DCBFE /* Pods-video_translator_pocTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -761,7 +781,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "dev.tunks.video-translator-pocTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/video_translator_poc.app/video_translator_poc";
 			};
@@ -769,7 +789,7 @@
 		};
 		0493A928212DC82B00125F9D /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 14DDEE498E5652FD404EA928 /* Pods-video_translator_pocUITests.debug.xcconfig */;
+			baseConfigurationReference = A5D358BFCF6AEDFE7FD9FCD4 /* Pods-video_translator_pocUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -782,7 +802,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "dev.tunks.video-translator-pocUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = video_translator_poc;
 			};
@@ -790,7 +810,7 @@
 		};
 		0493A929212DC82B00125F9D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BE12B898486A948FB7362E34 /* Pods-video_translator_pocUITests.release.xcconfig */;
+			baseConfigurationReference = 962A4AA2BF4BBB2EDF98357C /* Pods-video_translator_pocUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -803,7 +823,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "dev.tunks.video-translator-pocUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = video_translator_poc;
 			};

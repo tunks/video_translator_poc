@@ -31,23 +31,9 @@ public class VisualRecognition {
     /// The default HTTP headers for all requests to the service.
     public var defaultHeaders = [String: String]()
 
-    internal let session = URLSession(configuration: URLSessionConfiguration.default)
-    internal var authMethod: AuthenticationMethod
-    internal let domain = "com.ibm.watson.developer-cloud.VisualRecognitionV3"
-    internal let version: String
-
-    /**
-     Create a `VisualRecognition` object.
-
-     - parameter apiKey: The API key used to authenticate with the service.
-     - parameter version: The release date of the version of the API to use. Specify the date
-       in "YYYY-MM-DD" format.
-     */
-    public init(apiKey: String, version: String) {
-        self.authMethod = APIKeyAuthentication(name: "api_key", key: apiKey, location: .query)
-        self.version = version
-        self.serviceURL = "https://gateway-a.watsonplatform.net/visual-recognition/api"
-    }
+    var session = URLSession(configuration: URLSessionConfiguration.default)
+    var authMethod: AuthenticationMethod
+    let version: String
 
     /**
      Create a `VisualRecognition` object.
@@ -58,8 +44,9 @@ public class VisualRecognition {
      - parameter iamUrl: The URL for the IAM service.
      */
     public init(version: String, apiKey: String, iamUrl: String? = nil) {
+        self.authMethod = Shared.getAuthMethod(apiKey: apiKey, iamURL: iamUrl)
         self.version = version
-        self.authMethod = IAMAuthentication(apiKey: apiKey, url: iamUrl)
+        Shared.configureRestRequest()
     }
 
     /**
@@ -70,8 +57,9 @@ public class VisualRecognition {
      - parameter accessToken: An access token for the service.
      */
     public init(version: String, accessToken: String) {
-        self.version = version
         self.authMethod = IAMAccessToken(accessToken: accessToken)
+        self.version = version
+        Shared.configureRestRequest()
     }
 
     public func accessToken(_ newToken: String) {
@@ -81,45 +69,54 @@ public class VisualRecognition {
     }
 
     /**
-     If the response or data represents an error returned by the Visual Recognition service,
-     then return NSError with information about the error that occured. Otherwise, return nil.
+     Use the HTTP response and data received by the Visual Recognition service to extract
+     information about the error that occurred.
 
-     - parameter data: Raw data returned from the service that may represent an error.
-     - parameter response: the URL response returned from the service.
+     - parameter data: Raw data returned by the service that may represent an error.
+     - parameter response: the URL response returned by the service.
      */
-    internal func errorResponseDecoder(data: Data, response: HTTPURLResponse) -> Error {
+    func errorResponseDecoder(data: Data, response: HTTPURLResponse) -> WatsonError {
 
-        let code = response.statusCode
+        let statusCode = response.statusCode
+        var errorMessage: String?
+        var metadata = [String: Any]()
+
         do {
             let json = try JSONDecoder().decode([String: JSON].self, from: data)
-            var userInfo: [String: Any] = [:]
-            if code == 403 {
+            metadata = [:]
+            switch statusCode {
+            case 403:
                 // ErrorAuthentication
                 if case let .some(.string(status)) = json["status"],
                     case let .some(.string(statusInfo)) = json["statusInfo"] {
-                    userInfo[NSLocalizedDescriptionKey] = "\(status): \(statusInfo)"
+                    errorMessage = statusInfo
+                    metadata["status"] = status
+                    metadata["statusInfo"] = statusInfo
                 }
-            } else if code == 404 {
+            case 404:
                 // "error": ErrorInfo
                 if case let .some(.object(errorObj)) = json["error"],
                     case let .some(.string(message)) = errorObj["description"],
                     case let .some(.string(errorID)) = errorObj["error_id"] {
-                    userInfo[NSLocalizedDescriptionKey] = "\(message) (error_id = \(errorID))"
+                    errorMessage = message
+                    metadata["description"] = message
+                    metadata["errorID"] = errorID
                 }
-            } else if code == 413 {
+            case 413:
                 // ErrorHTML
                 if case let .some(.string(message)) = json["Error"] {
-                    userInfo[NSLocalizedDescriptionKey] = message
+                    errorMessage = message
                 }
-            } else {
+            default:
                 // ErrorResponse
                 if case let .some(.string(message)) = json["error"] {
-                    userInfo[NSLocalizedDescriptionKey] = message
+                    errorMessage = message
                 }
             }
-            return NSError(domain: domain, code: code, userInfo: userInfo)
+            // If metadata is empty, it should show up as nil in the WatsonError
+            return WatsonError.http(statusCode: statusCode, message: errorMessage, metadata: !metadata.isEmpty ? metadata : nil)
         } catch {
-            return NSError(domain: domain, code: code, userInfo: nil)
+            return WatsonError.http(statusCode: statusCode, message: nil, metadata: nil)
         }
     }
 
@@ -132,11 +129,7 @@ public class VisualRecognition {
        no more than 20 images and limit the .zip file to 100 MB. Encode the image and .zip file names in UTF-8 if they
        contain non-ASCII characters. The service assumes UTF-8 encoding if it encounters non-ASCII characters.
        You can also include an image with the **url** parameter.
-     - parameter acceptLanguage: The language of the output class names. The full set of languages is supported for
-       the built-in classifier IDs: `default`, `food`, and `explicit`. The class names of custom classifiers are not
-       translated.
-       The response might not be in the specified language when the requested language is not supported or when there is
-       no translation for the class name.
+     - parameter acceptLanguage: The desired language of parts of the response. See the response for details.
      - parameter url: The URL of an image to analyze. Must be in .jpg, or .png format. The minimum recommended pixel
        density is 32X32 pixels per inch, and the maximum image size is 10 MB.
        You can also include images with the **images_file** parameter.
@@ -156,55 +149,51 @@ public class VisualRecognition {
        - `explicit`: Evaluates whether the image might be pornographic.
      - parameter imagesFileContentType: The content type of imagesFile.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func classify(
         imagesFile: URL? = nil,
+        acceptLanguage: String? = nil,
         url: String? = nil,
         threshold: Double? = nil,
         owners: [String]? = nil,
         classifierIDs: [String]? = nil,
-        acceptLanguage: String? = nil,
+        imagesFileContentType: String? = nil,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (ClassifiedImages) -> Void)
+        completionHandler: @escaping (WatsonResponse<ClassifiedImages>?, WatsonError?) -> Void)
     {
         // construct body
         let multipartFormData = MultipartFormData()
         if let imagesFile = imagesFile {
-            multipartFormData.append(imagesFile, withName: "images_file")
+            do {
+                try multipartFormData.append(file: imagesFile, withName: "images_file")
+            } catch {
+                completionHandler(nil, WatsonError.serialization(values: "file \(imagesFile.path)"))
+                return
+            }
         }
         if let url = url {
-            guard let urlData = url.data(using: .utf8) else {
-                failure?(RestError.serializationError)
-                return
+            if let urlData = url.data(using: .utf8) {
+                multipartFormData.append(urlData, withName: "url")
             }
-            multipartFormData.append(urlData, withName: "url")
         }
         if let threshold = threshold {
-            guard let thresholdData = "\(threshold)".data(using: .utf8) else {
-                failure?(RestError.serializationError)
-                return
+            if let thresholdData = "\(threshold)".data(using: .utf8) {
+                multipartFormData.append(thresholdData, withName: "threshold")
             }
-            multipartFormData.append(thresholdData, withName: "threshold")
         }
         if let owners = owners {
-            guard let ownersData = owners.joined(separator: ",").data(using: .utf8) else {
-                failure?(RestError.serializationError)
-                return
+            if let ownersData = owners.joined(separator: ",").data(using: .utf8) {
+                multipartFormData.append(ownersData, withName: "owners")
             }
-            multipartFormData.append(ownersData, withName: "owners")
         }
         if let classifierIDs = classifierIDs {
-            guard let classifierIDsData = classifierIDs.joined(separator: ",").data(using: .utf8) else {
-                failure?(RestError.serializationError)
-                return
+            if let classifierIDsData = classifierIDs.joined(separator: ",").data(using: .utf8) {
+                multipartFormData.append(classifierIDsData, withName: "classifier_ids")
             }
-            multipartFormData.append(classifierIDsData, withName: "classifier_ids")
         }
         guard let body = try? multipartFormData.toData() else {
-            failure?(RestError.encodingError)
+            completionHandler(nil, WatsonError.serialization(values: "request multipart form data"))
             return
         }
 
@@ -236,13 +225,7 @@ public class VisualRecognition {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<ClassifiedImages>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.responseObject(completionHandler: completionHandler)
     }
 
     /**
@@ -251,7 +234,7 @@ public class VisualRecognition {
      **Important:** On April 2, 2018, the identity information in the response to calls to the Face model was removed.
      The identity information refers to the `name` of the person, `score`, and `type_hierarchy` knowledge graph. For
      details about the enhanced Face model, see the [Release
-     notes](https://console.bluemix.net/docs/services/visual-recognition/release-notes.html#2april2018).
+     notes](https://cloud.ibm.com/docs/services/visual-recognition/release-notes.html#2april2018).
      Analyze and get data about faces in images. Responses can include estimated age and gender. This feature uses a
      built-in model, so no training is necessary. The Detect faces method does not support general biometric facial
      recognition.
@@ -267,32 +250,36 @@ public class VisualRecognition {
        recommended pixel density is 32X32 pixels per inch, and the maximum image size is 10 MB. Redirects are followed,
        so you can use a shortened URL.
        You can also include images with the **images_file** parameter.
+     - parameter acceptLanguage: The desired language of parts of the response. See the response for details.
      - parameter imagesFileContentType: The content type of imagesFile.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func detectFaces(
         imagesFile: URL? = nil,
         url: String? = nil,
+        acceptLanguage: String? = nil,
+        imagesFileContentType: String? = nil,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (DetectedFaces) -> Void)
+        completionHandler: @escaping (WatsonResponse<DetectedFaces>?, WatsonError?) -> Void)
     {
         // construct body
         let multipartFormData = MultipartFormData()
         if let imagesFile = imagesFile {
-            multipartFormData.append(imagesFile, withName: "images_file", mimeType: "application/octet-stream")
-        }
-        if let url = url {
-            guard let urlData = url.data(using: .utf8) else {
-                failure?(RestError.serializationError)
+            do {
+                try multipartFormData.append(file: imagesFile, withName: "images_file")
+            } catch {
+                completionHandler(nil, WatsonError.serialization(values: "file \(imagesFile.path)"))
                 return
             }
-            multipartFormData.append(urlData, withName: "url")
+        }
+        if let url = url {
+            if let urlData = url.data(using: .utf8) {
+                multipartFormData.append(urlData, withName: "url")
+            }
         }
         guard let body = try? multipartFormData.toData() else {
-            failure?(RestError.encodingError)
+            completionHandler(nil, WatsonError.serialization(values: "request multipart form data"))
             return
         }
 
@@ -303,6 +290,9 @@ public class VisualRecognition {
         }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = multipartFormData.contentType
+        if let acceptLanguage = acceptLanguage {
+            headerParameters["Accept-Language"] = acceptLanguage
+        }
 
         // construct query parameters
         var queryParameters = [URLQueryItem]()
@@ -321,13 +311,7 @@ public class VisualRecognition {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<DetectedFaces>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.responseObject(completionHandler: completionHandler)
     }
 
     /**
@@ -340,42 +324,51 @@ public class VisualRecognition {
      names). The service assumes UTF-8 encoding if it encounters non-ASCII characters.
 
      - parameter name: The name of the new classifier. Encode special characters in UTF-8.
-     - parameter positiveExamples: An array of of positive examples, each with a name and a compressed (.zip) file
-       of images that depict the visual subject of a class in the new classifier. You can include more than one
-       positive example file in a call.
-       Include at least 10 images in .jpg or .png format. The minimum recommended image resolution is 32X32 pixels.
-       The maximum number of images is 10,000 images or 100 MB per .zip file.
+     - parameter positiveExamples: A dictionary that contains the value for each classname. The value are a .zip file
+       of images that depict the visual subject of a class in the new classifier. You can include more than one positive
+       example file in a call.
+       Specify the parameter name by appending `_positive_examples` to the class name. For example,
+       `goldenretriever_positive_examples` creates the class **goldenretriever**.
+       Include at least 10 images in .jpg or .png format. The minimum recommended image resolution is 32X32 pixels. The
+       maximum number of images is 10,000 images or 100 MB per .zip file.
        Encode special characters in the file name in UTF-8.
      - parameter negativeExamples: A .zip file of images that do not depict the visual subject of any of the classes
        of the new classifier. Must contain a minimum of 10 images.
        Encode special characters in the file name in UTF-8.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func createClassifier(
         name: String,
-        positiveExamples: [PositiveExample],
+        positiveExamples: [String: URL],
         negativeExamples: URL? = nil,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (Classifier) -> Void)
+        completionHandler: @escaping (WatsonResponse<Classifier>?, WatsonError?) -> Void)
     {
         // construct body
         let multipartFormData = MultipartFormData()
-        guard let nameData = name.data(using: .utf8) else {
-            failure?(RestError.serializationError)
-            return
+        if let nameData = name.data(using: .utf8) {
+            multipartFormData.append(nameData, withName: "name")
         }
-        multipartFormData.append(nameData, withName: "name")
-        positiveExamples.forEach { example in
-            multipartFormData.append(example.examples, withName: example.name + "_positive_examples")
+        positiveExamples.forEach { (classname, value) in
+            let partName = "\(classname)_positive_examples"
+            do {
+                try multipartFormData.append(file: value, withName: partName)
+            } catch {
+                completionHandler(nil, WatsonError.serialization(values: "file \(value)"))
+                return
+            }
         }
         if let negativeExamples = negativeExamples {
-            multipartFormData.append(negativeExamples, withName: "negative_examples")
+            do {
+                try multipartFormData.append(file: negativeExamples, withName: "negative_examples")
+            } catch {
+                completionHandler(nil, WatsonError.serialization(values: "file \(negativeExamples.path)"))
+                return
+            }
         }
         guard let body = try? multipartFormData.toData() else {
-            failure?(RestError.encodingError)
+            completionHandler(nil, WatsonError.serialization(values: "request multipart form data"))
             return
         }
 
@@ -404,31 +397,21 @@ public class VisualRecognition {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<Classifier>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.responseObject(completionHandler: completionHandler)
     }
 
     /**
      Retrieve a list of classifiers.
 
-     - parameter owners: Unused. This parameter will be removed in a future release.
      - parameter verbose: Specify `true` to return details about the classifiers. Omit this parameter to return a
        brief list of classifiers.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func listClassifiers(
-        owners: [String]? = nil,
         verbose: Bool? = nil,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (Classifiers) -> Void)
+        completionHandler: @escaping (WatsonResponse<Classifiers>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
@@ -457,13 +440,7 @@ public class VisualRecognition {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<Classifiers>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.responseObject(completionHandler: completionHandler)
     }
 
     /**
@@ -473,14 +450,12 @@ public class VisualRecognition {
 
      - parameter classifierID: The ID of the classifier.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func getClassifier(
         classifierID: String,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (Classifier) -> Void)
+        completionHandler: @escaping (WatsonResponse<Classifier>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
@@ -496,7 +471,7 @@ public class VisualRecognition {
         // construct REST request
         let path = "/v3/classifiers/\(classifierID)"
         guard let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            failure?(RestError.encodingError)
+            completionHandler(nil, WatsonError.urlEncoding(path: path))
             return
         }
         let request = RestRequest(
@@ -510,13 +485,7 @@ public class VisualRecognition {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<Classifier>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.responseObject(completionHandler: completionHandler)
     }
 
     /**
@@ -525,7 +494,7 @@ public class VisualRecognition {
      Update a custom classifier by adding new positive or negative classes (examples) or by adding new images to
      existing classes. You must supply at least one set of positive or negative examples. For details, see [Updating
      custom
-     classifiers](https://console.bluemix.net/docs/services/visual-recognition/customizing.html#updating-custom-classifiers).
+     classifiers](https://cloud.ibm.com/docs/services/visual-recognition/customizing.html#updating-custom-classifiers).
      Encode all names in UTF-8 if they contain non-ASCII characters (.zip and image file names, and classifier and class
      names). The service assumes UTF-8 encoding if it encounters non-ASCII characters.
      **Tip:** Don't make retraining calls on a classifier until the status is ready. When you submit retraining requests
@@ -533,39 +502,50 @@ public class VisualRecognition {
      classifier retraining finished.
 
      - parameter classifierID: The ID of the classifier.
-     - parameter positiveExamples: An array of positive examples, each with a name and a compressed (.zip) file
-       of images that depict the visual subject of a class in the classifier. The positive examples create
-       or update classes in the classifier. You can include more than one positive example file in a call.
-       Include at least 10 images in .jpg or .png format. The minimum recommended image resolution is 32X32 pixels.
-       The maximum number of images is 10,000 images or 100 MB per .zip file.
+     - parameter positiveExamples: A dictionary that contains the value for each classname. The value are a .zip file
+       of images that depict the visual subject of a class in the classifier. The positive examples create or update
+       classes in the classifier. You can include more than one positive example file in a call.
+       Specify the parameter name by appending `_positive_examples` to the class name. For example,
+       `goldenretriever_positive_examples` creates the class `goldenretriever`.
+       Include at least 10 images in .jpg or .png format. The minimum recommended image resolution is 32X32 pixels. The
+       maximum number of images is 10,000 images or 100 MB per .zip file.
        Encode special characters in the file name in UTF-8.
      - parameter negativeExamples: A .zip file of images that do not depict the visual subject of any of the classes
        of the new classifier. Must contain a minimum of 10 images.
        Encode special characters in the file name in UTF-8.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func updateClassifier(
         classifierID: String,
-        positiveExamples: [PositiveExample]? = nil,
+        positiveExamples: [String: URL]? = nil,
         negativeExamples: URL? = nil,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (Classifier) -> Void)
+        completionHandler: @escaping (WatsonResponse<Classifier>?, WatsonError?) -> Void)
     {
         // construct body
         let multipartFormData = MultipartFormData()
         if let positiveExamples = positiveExamples {
-            positiveExamples.forEach { example in
-                multipartFormData.append(example.examples, withName: example.name + "_positive_examples")
+            positiveExamples.forEach { (classname, value) in
+                let partName = "\(classname)_positive_examples"
+                do {
+                    try multipartFormData.append(file: value, withName: partName)
+                } catch {
+                    completionHandler(nil, WatsonError.serialization(values: "file \(value)"))
+                    return
+                }
             }
         }
         if let negativeExamples = negativeExamples {
-            multipartFormData.append(negativeExamples, withName: "negative_examples")
+            do {
+                try multipartFormData.append(file: negativeExamples, withName: "negative_examples")
+            } catch {
+                completionHandler(nil, WatsonError.serialization(values: "file \(negativeExamples.path)"))
+                return
+            }
         }
         guard let body = try? multipartFormData.toData() else {
-            failure?(RestError.encodingError)
+            completionHandler(nil, WatsonError.serialization(values: "request multipart form data"))
             return
         }
 
@@ -584,7 +564,7 @@ public class VisualRecognition {
         // construct REST request
         let path = "/v3/classifiers/\(classifierID)"
         guard let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            failure?(RestError.encodingError)
+            completionHandler(nil, WatsonError.urlEncoding(path: path))
             return
         }
         let request = RestRequest(
@@ -599,13 +579,7 @@ public class VisualRecognition {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<Classifier>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.responseObject(completionHandler: completionHandler)
     }
 
     /**
@@ -613,14 +587,12 @@ public class VisualRecognition {
 
      - parameter classifierID: The ID of the classifier.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func deleteClassifier(
         classifierID: String,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping () -> Void)
+        completionHandler: @escaping (WatsonResponse<Void>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
@@ -636,7 +608,7 @@ public class VisualRecognition {
         // construct REST request
         let path = "/v3/classifiers/\(classifierID)"
         guard let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            failure?(RestError.encodingError)
+            completionHandler(nil, WatsonError.urlEncoding(path: path))
             return
         }
         let request = RestRequest(
@@ -650,13 +622,7 @@ public class VisualRecognition {
         )
 
         // execute REST request
-        request.responseVoid {
-            (response: RestResponse) in
-            switch response.result {
-            case .success: success()
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.response(completionHandler: completionHandler)
     }
 
     /**
@@ -667,14 +633,12 @@ public class VisualRecognition {
 
      - parameter classifierID: The ID of the classifier.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
-    public func getCoreMlModel(
+    public func getCoreMLModel(
         classifierID: String,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (URL) -> Void)
+        completionHandler: @escaping (WatsonResponse<Data>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
@@ -690,7 +654,7 @@ public class VisualRecognition {
         // construct REST request
         let path = "/v3/classifiers/\(classifierID)/core_ml_model"
         guard let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            failure?(RestError.encodingError)
+            completionHandler(nil, WatsonError.urlEncoding(path: path))
             return
         }
         let request = RestRequest(
@@ -704,13 +668,7 @@ public class VisualRecognition {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<URL>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.response(completionHandler: completionHandler)
     }
 
     /**
@@ -720,18 +678,16 @@ public class VisualRecognition {
      the customer ID.
      You associate a customer ID with data by passing the `X-Watson-Metadata` header with a request that passes data.
      For more information about personal data and customer IDs, see [Information
-     security](https://console.bluemix.net/docs/services/visual-recognition/information-security.html).
+     security](https://cloud.ibm.com/docs/services/visual-recognition/information-security.html).
 
      - parameter customerID: The customer ID for which all data is to be deleted.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func deleteUserData(
         customerID: String,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping () -> Void)
+        completionHandler: @escaping (WatsonResponse<Void>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
@@ -757,13 +713,7 @@ public class VisualRecognition {
         )
 
         // execute REST request
-        request.responseVoid {
-            (response: RestResponse) in
-            switch response.result {
-            case .success: success()
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.response(completionHandler: completionHandler)
     }
 
 }

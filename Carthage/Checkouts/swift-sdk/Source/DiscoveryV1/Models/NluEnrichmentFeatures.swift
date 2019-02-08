@@ -17,7 +17,7 @@
 import Foundation
 
 /** NluEnrichmentFeatures. */
-public struct NluEnrichmentFeatures: Codable {
+public struct NluEnrichmentFeatures: Codable, Equatable {
 
     /**
      An object specifying the Keyword enrichment and related parameters.
@@ -40,7 +40,7 @@ public struct NluEnrichmentFeatures: Codable {
     public var emotion: NluEnrichmentEmotion?
 
     /**
-     An object specifying the categories enrichment and related parameters.
+     An object that indicates the Categories enrichment will be applied to the specified field.
      */
     public var categories: NluEnrichmentCategories?
 
@@ -54,6 +54,11 @@ public struct NluEnrichmentFeatures: Codable {
      */
     public var relations: NluEnrichmentRelations?
 
+    /**
+     An object specifiying the concepts enrichment and related parameters.
+     */
+    public var concepts: NluEnrichmentConcepts?
+
     // Map each property name to the key that shall be used for encoding/decoding.
     private enum CodingKeys: String, CodingKey {
         case keywords = "keywords"
@@ -63,6 +68,7 @@ public struct NluEnrichmentFeatures: Codable {
         case categories = "categories"
         case semanticRoles = "semantic_roles"
         case relations = "relations"
+        case concepts = "concepts"
     }
 
     /**
@@ -72,9 +78,11 @@ public struct NluEnrichmentFeatures: Codable {
      - parameter entities: An object speficying the Entities enrichment and related parameters.
      - parameter sentiment: An object specifying the sentiment extraction enrichment and related parameters.
      - parameter emotion: An object specifying the emotion detection enrichment and related parameters.
-     - parameter categories: An object specifying the categories enrichment and related parameters.
+     - parameter categories: An object that indicates the Categories enrichment will be applied to the specified
+       field.
      - parameter semanticRoles: An object specifiying the semantic roles enrichment and related parameters.
      - parameter relations: An object specifying the relations enrichment and related parameters.
+     - parameter concepts: An object specifiying the concepts enrichment and related parameters.
 
      - returns: An initialized `NluEnrichmentFeatures`.
     */
@@ -85,7 +93,8 @@ public struct NluEnrichmentFeatures: Codable {
         emotion: NluEnrichmentEmotion? = nil,
         categories: NluEnrichmentCategories? = nil,
         semanticRoles: NluEnrichmentSemanticRoles? = nil,
-        relations: NluEnrichmentRelations? = nil
+        relations: NluEnrichmentRelations? = nil,
+        concepts: NluEnrichmentConcepts? = nil
     )
     {
         self.keywords = keywords
@@ -95,6 +104,7 @@ public struct NluEnrichmentFeatures: Codable {
         self.categories = categories
         self.semanticRoles = semanticRoles
         self.relations = relations
+        self.concepts = concepts
     }
 
 }

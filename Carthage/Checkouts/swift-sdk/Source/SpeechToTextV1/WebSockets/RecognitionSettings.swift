@@ -21,17 +21,22 @@ import Foundation
  use a default value provided by the Watson Speech to Text service.
 
  For more information about the Speech to Text service parameters, visit:
- https://console.bluemix.net/docs/services/speech-to-text/input.html
+ https://cloud.ibm.com/docs/services/speech-to-text/input.html
  */
-public struct RecognitionSettings: Encodable {
+public struct RecognitionSettings: Codable, Equatable {
 
     /// The action to perform. Must be `start` to begin the request.
     private let action = "start"
 
     /// The format of the audio data. Endianness is automatically detected by the Speech to Text
-    /// service. For more information aboutthe supported formats, visit:
-    /// https://console.bluemix.net/docs/services/speech-to-text/input.html#formats
-    public var contentType: String
+    /// service. For more information about the supported formats, visit:
+    /// https://cloud.ibm.com/docs/services/speech-to-text/audio-formats.html
+    public var contentType: String?
+
+    /// If you specify a customization ID when you open the connection, you can use the customization
+    /// weight to tell the service how much weight to give to words from the custom language model
+    /// compared to those from the base model for the current request.
+    public var customizationWeight: Double?
 
     /// The number of seconds after which the connection is to time out due to inactivity.
     /// Use `-1` to set the timeout to infinity. The default is `30` seconds.
@@ -82,25 +87,43 @@ public struct RecognitionSettings: Encodable {
     /// If `true`, then speaker labels will be returned for each timestamp.  The default is `false`.
     public var speakerLabels: Bool?
 
+    /// The name of a grammar that is to be used with the recognition request. If you specify a
+    /// grammar, you must also use the `language_customization_id` parameter to specify the name of the custom language
+    /// model for which the grammar is defined. The service recognizes only strings that are recognized by the specified
+    /// grammar; it does not recognize other custom words from the model's words resource. See
+    /// [Grammars](https://cloud.ibm.com/docs/services/speech-to-text/output.html).
+    public var grammarName: String?
+
+    /// If `true`, the service redacts, or masks, numeric data from final transcripts. The feature
+    /// redacts any number that has three or more consecutive digits by replacing each digit with an `X` character. It is
+    /// intended to redact sensitive numeric data, such as credit card numbers. By default, the service performs no
+    /// redaction.
+    /// When you enable redaction, the service automatically enables smart formatting, regardless of whether you
+    /// explicitly disable that feature. To ensure maximum security, the service also disables keyword spotting (ignores
+    /// the `keywords` and `keywords_threshold` parameters) and returns only a single final transcript (forces the
+    /// `max_alternatives` parameter to be `1`).
+    /// **Note:** Applies to US English, Japanese, and Korean transcription only.
+    /// See [Numeric redaction](https://cloud.ibm.com/docs/services/speech-to-text/output.html#redaction).
+    public var redaction: Bool?
+
     /**
      Initialize a `RecognitionSettings` object to set the parameters of a Watson Speech to
      Text recognition request.
-
      - parameter contentType: The format of the audio data. Endianness is automatically detected
         by the Speech to Text service. For more information about the supported formats, visit:
-        https://console.bluemix.net/docs/services/speech-to-text/input.html#formats
-
+        https://cloud.ibm.com/docs/services/speech-to-text/audio-formats.html
      - returns: An initialized `RecognitionSettings` object with the given `contentType`.
         Configure additional parameters for the recognition request by directly modifying
         the returned object's properties.
      */
-    public init(contentType: String) {
+    public init(contentType: String? = nil) {
         self.contentType = contentType
     }
 
     private enum CodingKeys: String, CodingKey {
         case action = "action"
         case contentType = "content-type"
+        case customizationWeight = "customization_weight"
         case inactivityTimeout = "inactivity_timeout"
         case keywords = "keywords"
         case keywordsThreshold = "keywords_threshold"
@@ -112,5 +135,7 @@ public struct RecognitionSettings: Encodable {
         case filterProfanity = "profanity_filter"
         case smartFormatting = "smart_formatting"
         case speakerLabels = "speaker_labels"
+        case grammarName = "grammar_name"
+        case redaction = "redaction"
     }
 }

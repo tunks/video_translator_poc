@@ -19,7 +19,7 @@ import Foundation
 /**
  A response containing the documents and aggregations for the query.
  */
-public struct QueryResponse: Decodable {
+public struct QueryResponse: Codable, Equatable {
 
     public var matchingResults: Int?
 
@@ -38,6 +38,11 @@ public struct QueryResponse: Decodable {
      */
     public var sessionToken: String?
 
+    /**
+     An object contain retrieval type information.
+     */
+    public var retrievalDetails: RetrievalDetails?
+
     // Map each property name to the key that shall be used for encoding/decoding.
     private enum CodingKeys: String, CodingKey {
         case matchingResults = "matching_results"
@@ -46,6 +51,7 @@ public struct QueryResponse: Decodable {
         case passages = "passages"
         case duplicatesRemoved = "duplicates_removed"
         case sessionToken = "session_token"
+        case retrievalDetails = "retrieval_details"
     }
 
 }

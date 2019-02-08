@@ -17,7 +17,7 @@
 import Foundation
 
 /** Enrichment. */
-public struct Enrichment: Codable {
+public struct Enrichment: Codable, Equatable {
 
     /**
      Describes what the enrichment step does.
@@ -47,7 +47,7 @@ public struct Enrichment: Codable {
      options.
       When using `elements` the **options** object must contain Element Classification options. Additionally, when using
      the `elements` enrichment the configuration specified and files ingested must meet all the criteria specified in
-     [the documentation](https://console.bluemix.net/docs/services/discovery/element-classification.html)
+     [the documentation](https://cloud.ibm.com/docs/services/discovery/element-classification.html)
       Previous API versions also supported `alchemy_language`.
      */
     public var enrichmentName: String
@@ -59,7 +59,7 @@ public struct Enrichment: Codable {
     public var ignoreDownstreamErrors: Bool?
 
     /**
-     A list of options specific to the enrichment.
+     Options which are specific to a particular enrichment.
      */
     public var options: EnrichmentOptions?
 
@@ -87,14 +87,14 @@ public struct Enrichment: Codable {
        options.
         When using `elements` the **options** object must contain Element Classification options. Additionally, when
        using the `elements` enrichment the configuration specified and files ingested must meet all the criteria
-       specified in [the documentation](https://console.bluemix.net/docs/services/discovery/element-classification.html)
+       specified in [the documentation](https://cloud.ibm.com/docs/services/discovery/element-classification.html)
         Previous API versions also supported `alchemy_language`.
      - parameter description: Describes what the enrichment step does.
      - parameter overwrite: Indicates that the enrichments will overwrite the destination_field field if it already
        exists.
      - parameter ignoreDownstreamErrors: If true, then most errors generated during the enrichment process will be
        treated as warnings and will not cause the document to fail processing.
-     - parameter options: A list of options specific to the enrichment.
+     - parameter options: Options which are specific to a particular enrichment.
 
      - returns: An initialized `Enrichment`.
     */

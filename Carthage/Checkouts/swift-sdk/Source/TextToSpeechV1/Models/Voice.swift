@@ -17,7 +17,7 @@
 import Foundation
 
 /** Voice. */
-public struct Voice: Decodable {
+public struct Voice: Codable, Equatable {
 
     /**
      The URI of the voice.
@@ -51,7 +51,7 @@ public struct Voice: Decodable {
     public var customizable: Bool
 
     /**
-     Describes the additional service features supported with the voice.
+     Describes the additional service features that are supported with the voice.
      */
     public var supportedFeatures: SupportedFeatures
 

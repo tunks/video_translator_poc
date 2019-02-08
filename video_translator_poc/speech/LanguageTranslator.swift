@@ -29,7 +29,7 @@ class WatsonLanguageTranslator : Translator {
     var translator : LanguageTranslator!
     var handler: WastonTranslateHandler?
     private let failure = { (error: Error) in print(error) }
-    private var modelId = { (source: String, target: String ) -> String in return source+"-"+target}
+    private var ModelId = { (source: String, target: String ) -> String in return source+"-"+target}
     
     init(){
         translator = LanguageTranslator(version: Credentials.TranslateVersion,
@@ -40,11 +40,18 @@ class WatsonLanguageTranslator : Translator {
     }
     
     func translate(text: String, source: String, target: String){
-        let  request = TranslateRequest(text: [text], modelID: modelId(source, target),
-                                        source: source, target: target )
-        self.translator.translate(request: request, failure: failure, success: { (translation) -> Void in
+       // let  request = TranslateRequest(text: [text], modelID: modelId(source, target),
+         //                               source: source, target: target )
+        ///source: "en", target: "es"
+        //let modelId = ModelId(source,target)
+        self.translator.translate(text: [text], source: source, target: target) { (response,error) in
+            self.handler?.handle(result: (response?.result)!, language: target)
+        }
+        /*
+        self.translator.translate(mo failure: failure, success: { (translation) -> Void in
             self.handler?.handle(result: translation, language: target)
         })
+ */
     }
     
 }

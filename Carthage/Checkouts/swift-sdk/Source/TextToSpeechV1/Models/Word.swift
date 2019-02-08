@@ -17,13 +17,13 @@
 import Foundation
 
 /** Word. */
-public struct Word: Codable {
+public struct Word: Codable, Equatable {
 
     /**
      **Japanese only.** The part of speech for the word. The service uses the value to produce the correct intonation
      for the word. You can create only a single entry, with or without a single part of speech, for any word; you cannot
      create multiple entries with different parts of speech for the same word. For more information, see [Working with
-     Japanese entries](https://console.bluemix.net/docs/services/text-to-speech/custom-rules.html#jaNotes).
+     Japanese entries](https://cloud.ibm.com/docs/services/text-to-speech/custom-rules.html#jaNotes).
      */
     public enum PartOfSpeech: String {
         case josi = "Josi"
@@ -61,7 +61,7 @@ public struct Word: Codable {
      **Japanese only.** The part of speech for the word. The service uses the value to produce the correct intonation
      for the word. You can create only a single entry, with or without a single part of speech, for any word; you cannot
      create multiple entries with different parts of speech for the same word. For more information, see [Working with
-     Japanese entries](https://console.bluemix.net/docs/services/text-to-speech/custom-rules.html#jaNotes).
+     Japanese entries](https://cloud.ibm.com/docs/services/text-to-speech/custom-rules.html#jaNotes).
      */
     public var partOfSpeech: String?
 
@@ -83,7 +83,7 @@ public struct Word: Codable {
        produce the correct intonation for the word. You can create only a single entry, with or without a single part of
        speech, for any word; you cannot create multiple entries with different parts of speech for the same word. For
        more information, see [Working with Japanese
-       entries](https://console.bluemix.net/docs/services/text-to-speech/custom-rules.html#jaNotes).
+       entries](https://cloud.ibm.com/docs/services/text-to-speech/custom-rules.html#jaNotes).
 
      - returns: An initialized `Word`.
     */

@@ -1,10 +1,12 @@
 Pod::Spec.new do |s|
 
   s.name                  = 'IBMWatsonSpeechToTextV1'
-  s.version               = '0.33.0'
+  s.version               = '1.3.1'
   s.summary               = 'Client framework for the IBM Watson Speech to Text service'
   s.description           = <<-DESC
-Easily convert audio and voice into written text for quick understanding of content.
+The IBM® Speech to Text leverages machine intelligence to transcribe the human voice accurately. 
+The service combines information about grammar and language structure with knowledge of the composition 
+of the audio signal. It continuously returns and retroactively updates a transcription as more speech is heard.
                             DESC
   s.homepage              = 'https://www.ibm.com/watson/services/speech-to-text/'
   s.license               = { :type => 'Apache License, Version 2.0', :file => 'LICENSE' }
@@ -12,19 +14,33 @@ Easily convert audio and voice into written text for quick understanding of cont
                               'Mike Kistler'    => 'mkistler@us.ibm.com' }
 
   s.module_name           = 'SpeechToText'
-  s.ios.deployment_target = '8.0'
-
-  s.source                = { :git => 'https://github.com/watson-developer-cloud/swift-sdk.git', :tag => "v#{s.version.to_s}" }
+  s.ios.deployment_target = '10.0'
+  s.source                = { :git => 'https://github.com/watson-developer-cloud/swift-sdk.git', :tag => s.version.to_s }
+  
   s.source_files          = 'Source/SpeechToTextV1/**/*.swift',
-                            'Source/SupportingFiles/Dependencies/**/*.{c,h}',
-                            'Source/SupportingFiles/SpeechToTextV1.h'
-  s.exclude_files         = 'Source/SupportingFiles/Dependencies/ogg/config_types.h',
-                            'Source/SupportingFiles/Dependencies/opus/opus_header.{h,c}'
+                            'Source/SupportingFiles/Shared.swift',
+                            'Source/SupportingFiles/Dependencies/Source/**/*'
+  s.exclude_files         = 'Source/SpeechToTextV1/Shared.swift',
+                            '**/config_types.h',
+                            '**/opus_header.h',
+                            '**/opus_header.c'
 
-  s.dependency              'IBMWatsonRestKit', s.version.to_s
-  s.dependency              'Starscream', '~> 3.0'
-  s.vendored_libraries    = 'Source/SupportingFiles/Dependencies/lib/*.a'
-  s.public_header_files   = 'Source/SupportingFiles/SpeechToTextV1.h', 
-                            'Source/SupportingFiles/Dependencies/**/*.h'
+  s.dependency              'IBMWatsonRestKit', '~> 2.0.0'
+  s.dependency              'Starscream', '3.0.5'
+  s.vendored_libraries    = 'Source/SupportingFiles/Dependencies/Libraries/*.a'
+
+  # The renaming of libogg.a and libopus.a is done to avoid duplicate library name errors
+  # in case TextToSpeech is being installed in the same app (which also includes libogg and libopus) 
+  # The ogg/ and opus/ files are flattened to the same directory so that all #include statements work
+  s.prepare_command = <<-CMD
+                        cd Source/SupportingFiles/Dependencies/Libraries
+                        mv libogg.a libogg_stt.a
+                        mv libopus.a libopus_stt.a
+                        cd ../Source
+                        mv ogg/* .
+                        mv opus/* .
+                        rm -rf ogg
+                        rm -rf opus
+                      CMD
 
 end

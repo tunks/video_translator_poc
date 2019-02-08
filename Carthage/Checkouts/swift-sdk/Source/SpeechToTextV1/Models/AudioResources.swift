@@ -17,7 +17,7 @@
 import Foundation
 
 /** AudioResources. */
-public struct AudioResources: Decodable {
+public struct AudioResources: Codable, Equatable {
 
     /**
      The total minutes of accumulated audio summed over all of the valid audio resources for the custom acoustic model.
@@ -26,8 +26,8 @@ public struct AudioResources: Decodable {
     public var totalMinutesOfAudio: Double
 
     /**
-     An array of objects that provides information about the audio resources of the custom acoustic model. The array is
-     empty if the custom model has no audio resources.
+     An array of `AudioResource` objects that provides information about the audio resources of the custom acoustic
+     model. The array is empty if the custom model has no audio resources.
      */
     public var audio: [AudioResource]
 

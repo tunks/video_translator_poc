@@ -20,41 +20,17 @@ import RestKit
 
 /**
  ### Service Overview
- The IBM&reg; Text to Speech service provides an API that uses IBM's speech-synthesis capabilities to synthesize text
- into natural-sounding speech in a variety of languages, dialects, and voices. The service supports at least one male or
- female voice, sometimes both, for each language. The audio is streamed back to the client with minimal delay. For more
- information about the service, see the [IBM&reg; Cloud
- documentation](https://console.bluemix.net/docs/services/text-to-speech/index.html).
- ### API usage guidelines
- * **Audio formats:** The service can produce audio in many formats (MIME types). See [Specifying an audio
- format](https://console.bluemix.net/docs/services/text-to-speech/http.html#format).
- * **SSML:** Many methods refer to the Speech Synthesis Markup Language (SSML). SSML is an XML-based markup language
- that provides text annotation for speech-synthesis applications. See [Using
- SSML](https://console.bluemix.net/docs/services/text-to-speech/SSML.html) and [Using IBM
- SPR](https://console.bluemix.net/docs/services/text-to-speech/SPRs.html).
- * **Word translations:** Many customization methods accept sounds-like or phonetic translations for words. Phonetic
- translations are based on the SSML phoneme format for representing a word. You can specify them in standard
- International Phonetic Alphabet (IPA) representation
-   &lt;phoneme alphabet="ipa" ph="t&#601;m&#712;&#593;to"&gt;&lt;/phoneme&gt;
-   or in the proprietary IBM Symbolic Phonetic Representation (SPR)
-   &lt;phoneme alphabet="ibm" ph="1gAstroEntxrYFXs"&gt;&lt;/phoneme&gt;
-   See [Understanding customization](https://console.bluemix.net/docs/services/text-to-speech/custom-intro.html).
- * **WebSocket interface:** The service also offers a WebSocket interface for speech synthesis. The WebSocket interface
- supports both plain text and SSML input, including the SSML &lt;mark&gt; element and word timings. See [The WebSocket
- interface](https://console.bluemix.net/docs/services/text-to-speech/websockets.html).
- * **Customization IDs:** Many methods accept a customization ID, which is a Globally Unique Identifier (GUID).
- Customization IDs are hexadecimal strings that have the format `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`.
- * **`X-Watson-Learning-Opt-Out`:** By default, all Watson services log requests and their results. Logging is done only
- to improve the services for future users. The logged data is not shared or made public. To prevent IBM from accessing
- your data for general service improvements, set the `X-Watson-Learning-Opt-Out` request header to `true` for all
- requests. You must set the header on each request that you do not want IBM to access for general service improvements.
-   Methods of the customization interface do not log words and translations that you use to build custom voice models.
- Your training data is never used to improve the service's base models. However, the service does log such data when a
- custom model is used with a synthesize request. You must set the `X-Watson-Learning-Opt-Out` request header to `true`
- to prevent IBM from accessing the data to improve the service.
- * **`X-Watson-Metadata`:** This header allows you to associate a customer ID with data that is passed with a request.
- If necessary, you can use the **Delete labeled data** method to delete the data for a customer ID. See [Information
- security](https://console.bluemix.net/docs/services/text-to-speech/information-security.html).
+ The IBM&reg; Text to Speech service provides APIs that use IBM's speech-synthesis capabilities to synthesize text into
+ natural-sounding speech in a variety of languages, dialects, and voices. The service supports at least one male or
+ female voice, sometimes both, for each language. The audio is streamed back to the client with minimal delay.
+ For speech synthesis, the service supports a synchronous HTTP Representational State Transfer (REST) interface. It also
+ supports a WebSocket interface that provides both plain text and SSML input, including the SSML &lt;mark&gt; element
+ and word timings. SSML is an XML-based markup language that provides text annotation for speech-synthesis applications.
+ The service also offers a customization interface. You can use the interface to define sounds-like or phonetic
+ translations for words. A sounds-like translation consists of one or more words that, when combined, sound like the
+ word. A phonetic translation is based on the SSML phoneme format for representing a word. You can specify a phonetic
+ translation in standard International Phonetic Alphabet (IPA) representation or in the proprietary IBM Symbolic
+ Phonetic Representation (SPR).
  */
 public class TextToSpeech {
 
@@ -64,9 +40,8 @@ public class TextToSpeech {
     /// The default HTTP headers for all requests to the service.
     public var defaultHeaders = [String: String]()
 
-    private let session = URLSession(configuration: URLSessionConfiguration.default)
-    private var authMethod: AuthenticationMethod
-    private let domain = "com.ibm.watson.developer-cloud.TextToSpeechV1"
+    var session = URLSession(configuration: URLSessionConfiguration.default)
+    var authMethod: AuthenticationMethod
 
     /**
      Create a `TextToSpeech` object.
@@ -75,7 +50,8 @@ public class TextToSpeech {
      - parameter password: The password used to authenticate with the service.
      */
     public init(username: String, password: String) {
-        self.authMethod = BasicAuthentication(username: username, password: password)
+        self.authMethod = Shared.getAuthMethod(username: username, password: password)
+        Shared.configureRestRequest()
     }
 
     /**
@@ -85,7 +61,8 @@ public class TextToSpeech {
      - parameter iamUrl: The URL for the IAM service.
      */
     public init(apiKey: String, iamUrl: String? = nil) {
-        self.authMethod = IAMAuthentication(apiKey: apiKey, url: iamUrl)
+        self.authMethod = Shared.getAuthMethod(apiKey: apiKey, iamURL: iamUrl)
+        Shared.configureRestRequest()
     }
 
     /**
@@ -95,6 +72,7 @@ public class TextToSpeech {
      */
     public init(accessToken: String) {
         self.authMethod = IAMAccessToken(accessToken: accessToken)
+        Shared.configureRestRequest()
     }
 
     public func accessToken(_ newToken: String) {
@@ -104,27 +82,31 @@ public class TextToSpeech {
     }
 
     /**
-     If the response or data represents an error returned by the Text to Speech service,
-     then return NSError with information about the error that occured. Otherwise, return nil.
+     Use the HTTP response and data received by the Text to Speech service to extract
+     information about the error that occurred.
 
-     - parameter data: Raw data returned from the service that may represent an error.
-     - parameter response: the URL response returned from the service.
+     - parameter data: Raw data returned by the service that may represent an error.
+     - parameter response: the URL response returned by the service.
      */
-    private func errorResponseDecoder(data: Data, response: HTTPURLResponse) -> Error {
+    func errorResponseDecoder(data: Data, response: HTTPURLResponse) -> WatsonError {
 
-        let code = response.statusCode
+        let statusCode = response.statusCode
+        var errorMessage: String?
+        var metadata = [String: Any]()
+
         do {
             let json = try JSONDecoder().decode([String: JSON].self, from: data)
-            var userInfo: [String: Any] = [:]
+            metadata = [:]
             if case let .some(.string(message)) = json["error"] {
-                userInfo[NSLocalizedDescriptionKey] = message
+                errorMessage = message
             }
             if case let .some(.string(description)) = json["code_description"] {
-                userInfo[NSLocalizedFailureReasonErrorKey] = description
+                metadata["codeDescription"] = description
             }
-            return NSError(domain: domain, code: code, userInfo: userInfo)
+            // If metadata is empty, it should show up as nil in the WatsonError
+            return WatsonError.http(statusCode: statusCode, message: errorMessage, metadata: !metadata.isEmpty ? metadata : nil)
         } catch {
-            return NSError(domain: domain, code: code, userInfo: nil)
+            return WatsonError.http(statusCode: statusCode, message: nil, metadata: nil)
         }
     }
 
@@ -133,15 +115,14 @@ public class TextToSpeech {
 
      Lists all voices available for use with the service. The information includes the name, language, gender, and other
      details about the voice. To see information about a specific voice, use the **Get a voice** method.
+     **See also:** [Specifying a voice](https://cloud.ibm.com/docs/services/text-to-speech/http.html#voices).
 
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func listVoices(
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (Voices) -> Void)
+        completionHandler: @escaping (WatsonResponse<Voices>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
@@ -161,13 +142,7 @@ public class TextToSpeech {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<Voices>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.responseObject(completionHandler: completionHandler)
     }
 
     /**
@@ -176,21 +151,20 @@ public class TextToSpeech {
      Gets information about the specified voice. The information includes the name, language, gender, and other details
      about the voice. Specify a customization ID to obtain information for that custom voice model of the specified
      voice. To list information about all available voices, use the **List voices** method.
+     **See also:** [Specifying a voice](https://cloud.ibm.com/docs/services/text-to-speech/http.html#voices).
 
      - parameter voice: The voice for which information is to be returned.
      - parameter customizationID: The customization ID (GUID) of a custom voice model for which information is to be
        returned. You must make the request with service credentials created for the instance of the service that owns
        the custom model. Omit the parameter to see information about the specified voice with no customization.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func getVoice(
         voice: String,
         customizationID: String? = nil,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (Voice) -> Void)
+        completionHandler: @escaping (WatsonResponse<Voice>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
@@ -209,7 +183,7 @@ public class TextToSpeech {
         // construct REST request
         let path = "/v1/voices/\(voice)"
         guard let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            failure?(RestError.encodingError)
+            completionHandler(nil, WatsonError.urlEncoding(path: path))
             return
         }
         let request = RestRequest(
@@ -223,42 +197,76 @@ public class TextToSpeech {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<Voice>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.responseObject(completionHandler: completionHandler)
     }
 
     /**
      Synthesize audio.
 
-     Synthesizes text to spoken audio, returning the synthesized audio stream as an array of bytes. You can pass a
-     maximum of 5 KB of text.  Use the `Accept` header or the `accept` query parameter to specify the requested format
-     (MIME type) of the response audio. By default, the service uses `audio/ogg;codecs=opus`. For detailed information
-     about the supported audio formats and sampling rates, see [Specifying an audio
-     format](https://console.bluemix.net/docs/services/text-to-speech/http.html#format).
-     If a request includes invalid query parameters, the service returns a `Warnings` response header that provides
+     Synthesizes text to audio that is spoken in the specified voice. The service bases its understanding of the
+     language for the input text on the specified voice. Use a voice that matches the language of the input text.
+     The service returns the synthesized audio stream as an array of bytes. You can pass a maximum of 5 KB of text to
+     the service.
+     **See also:** [Synthesizing text to
+     audio](https://cloud.ibm.com/docs/services/text-to-speech/http.html#synthesize).
+     ### Audio formats (accept types)
+      The service can return audio in the following formats (MIME types).
+     * Where indicated, you can optionally specify the sampling rate (`rate`) of the audio. You must specify a sampling
+     rate for the `audio/l16` and `audio/mulaw` formats. A specified sampling rate must lie in the range of 8 kHz to 192
+     kHz.
+     * For the `audio/l16` format, you can optionally specify the endianness (`endianness`) of the audio:
+     `endianness=big-endian` or `endianness=little-endian`.
+     Use the `Accept` header or the `accept` parameter to specify the requested format of the response audio. If you
+     omit an audio format altogether, the service returns the audio in Ogg format with the Opus codec
+     (`audio/ogg;codecs=opus`). The service always returns single-channel audio.
+     * `audio/basic`
+       The service returns audio with a sampling rate of 8000 Hz.
+     * `audio/flac`
+       You can optionally specify the `rate` of the audio. The default sampling rate is 22,050 Hz.
+     * `audio/l16`
+       You must specify the `rate` of the audio. You can optionally specify the `endianness` of the audio. The default
+     endianness is `little-endian`.
+     * `audio/mp3`
+       You can optionally specify the `rate` of the audio. The default sampling rate is 22,050 Hz.
+     * `audio/mpeg`
+       You can optionally specify the `rate` of the audio. The default sampling rate is 22,050 Hz.
+     * `audio/mulaw`
+       You must specify the `rate` of the audio.
+     * `audio/ogg`
+       The service returns the audio in the `vorbis` codec. You can optionally specify the `rate` of the audio. The
+     default sampling rate is 22,050 Hz.
+     * `audio/ogg;codecs=opus`
+       You can optionally specify the `rate` of the audio. The default sampling rate is 22,050 Hz.
+     * `audio/ogg;codecs=vorbis`
+       You can optionally specify the `rate` of the audio. The default sampling rate is 22,050 Hz.
+     * `audio/wav`
+       You can optionally specify the `rate` of the audio. The default sampling rate is 22,050 Hz.
+     * `audio/webm`
+       The service returns the audio in the `opus` codec. The service returns audio with a sampling rate of 48,000 Hz.
+     * `audio/webm;codecs=opus`
+       The service returns audio with a sampling rate of 48,000 Hz.
+     * `audio/webm;codecs=vorbis`
+       You can optionally specify the `rate` of the audio. The default sampling rate is 22,050 Hz.
+     For more information about specifying an audio format, including additional details about some of the formats, see
+     [Specifying an audio format](https://cloud.ibm.com/docs/services/text-to-speech/http.html#format).
+     ### Warning messages
+      If a request includes invalid query parameters, the service returns a `Warnings` response header that provides
      messages about the invalid parameters. The warning includes a descriptive message and a list of invalid argument
      strings. For example, a message such as `\"Unknown arguments:\"` or `\"Unknown url query arguments:\"` followed by
-     a list of the form `\"invalid_arg_1, invalid_arg_2.\"` The request succeeds despite the warnings.
+     a list of the form `\"{invalid_arg_1}, {invalid_arg_2}.\"` The request succeeds despite the warnings.
 
      - parameter text: The text to synthesize.
-     - parameter accept: The requested audio format (MIME type) of the audio. You can use the `Accept` header or the
-       `accept` query parameter to specify the audio format. (For the `audio/l16` format, you can optionally specify
-       `endianness=big-endian` or `endianness=little-endian`; the default is little endian.) For detailed information
-       about the supported audio formats and sampling rates, see [Specifying an audio
-       format](https://console.bluemix.net/docs/services/text-to-speech/http.html#format).
+     - parameter accept: The requested format (MIME type) of the audio. You can use the `Accept` header or the
+       `accept` parameter to specify the audio format. For more information about specifying an audio format, see
+       **Audio formats (accept types)** in the method description.
+       Default: `audio/ogg;codecs=opus`.
      - parameter voice: The voice to use for synthesis.
      - parameter customizationID: The customization ID (GUID) of a custom voice model to use for the synthesis. If a
        custom voice model is specified, it is guaranteed to work only if it matches the language of the indicated voice.
        You must make the request with service credentials created for the instance of the service that owns the custom
        model. Omit the parameter to use the specified voice with no customization.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func synthesize(
         text: String,
@@ -266,13 +274,13 @@ public class TextToSpeech {
         voice: String? = nil,
         customizationID: String? = nil,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (Data) -> Void)
+        completionHandler: @escaping (WatsonResponse<Data>?, WatsonError?) -> Void)
     {
         // construct body
-        let synthesizeRequest = Text(text: text)
+        let synthesizeRequest = Text(
+            text: text)
         guard let body = try? JSONEncoder().encode(synthesizeRequest) else {
-            failure?(RestError.serializationError)
+            completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
 
@@ -310,38 +318,35 @@ public class TextToSpeech {
         )
 
         // execute REST request
-        request.responseData {
-            (response: RestResponse<Data>) in
-            switch response.result {
-            case .success(let data):
-                if accept?.lowercased().contains("audio/wav") == true {
-                    // repair the WAV header
-                    var wav = data
-                    guard WAVRepair.isWAVFile(data: wav) else {
-                        let failureReason = "Returned audio is in an unexpected format."
-                        let userInfo = [NSLocalizedDescriptionKey: failureReason]
-                        let error = NSError(domain: self.domain, code: 0, userInfo: userInfo)
-                        failure?(error)
-                        return
-                    }
-                    WAVRepair.repairWAVHeader(data: &wav)
-                    success(wav)
-                } else if accept?.lowercased().contains("ogg") == true && accept?.lowercased().contains("opus") == true {
-                    do {
-                        let decodedAudio = try TextToSpeechDecoder(audioData: data)
-                        success(decodedAudio.pcmDataWithHeaders)
-                    } catch {
-                        let failureReason = "Returned audio is in an unexpected format."
-                        let userInfo = [NSLocalizedDescriptionKey: failureReason]
-                        let error = NSError(domain: self.domain, code: 0, userInfo: userInfo)
-                        failure?(error)
-                        return
-                    }
-                } else {
-                    success(data)
+        request.response { (response: WatsonResponse<Data>?, error: WatsonError?) in
+            var response = response
+            guard let data = response?.result else {
+                completionHandler(response, error)
+                return
+            }
+            if accept?.lowercased().contains("audio/wav") == true {
+                // repair the WAV header
+                var wav = data
+                guard WAVRepair.isWAVFile(data: wav) else {
+                    let error = WatsonError.other(message: "Expected returned audio to be in WAV format")
+                    completionHandler(nil, error)
+                    return
                 }
-            case .failure(let error):
-                failure?(error)
+                WAVRepair.repairWAVHeader(data: &wav)
+                response?.result = wav
+                completionHandler(response, nil)
+            } else if accept?.lowercased().contains("ogg") == true && accept?.lowercased().contains("opus") == true {
+                do {
+                    let decodedAudio = try TextToSpeechDecoder(audioData: data)
+                    response?.result = decodedAudio.pcmDataWithHeaders
+                    completionHandler(response, nil)
+                } catch {
+                    let error = WatsonError.serialization(values: "returned audio")
+                    completionHandler(nil, error)
+                    return
+                }
+            } else {
+                completionHandler(response, nil)
             }
         }
     }
@@ -353,6 +358,8 @@ public class TextToSpeech {
      You can also request the pronunciation for a specific voice to see the default translation for the language of that
      voice or for a specific custom voice model to see the translation for that voice model.
      **Note:** This method is currently a beta release.
+     **See also:** [Querying a word from a
+     language](https://cloud.ibm.com/docs/services/text-to-speech/custom-entries.html#cuWordsQueryLanguage).
 
      - parameter text: The word for which the pronunciation is requested.
      - parameter voice: A voice that specifies the language in which the pronunciation is to be returned. All voices
@@ -365,8 +372,7 @@ public class TextToSpeech {
        model's language. You must make the request with service credentials created for the instance of the service that
        owns the custom model. Omit the parameter to see the translation for the specified voice with no customization.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func getPronunciation(
         text: String,
@@ -374,8 +380,7 @@ public class TextToSpeech {
         format: String? = nil,
         customizationID: String? = nil,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (Pronunciation) -> Void)
+        completionHandler: @escaping (WatsonResponse<Pronunciation>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
@@ -412,13 +417,7 @@ public class TextToSpeech {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<Pronunciation>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.responseObject(completionHandler: completionHandler)
     }
 
     /**
@@ -428,27 +427,30 @@ public class TextToSpeech {
      specify the language and a description for the new model. The model is owned by the instance of the service whose
      credentials are used to create it.
      **Note:** This method is currently a beta release.
+     **See also:** [Creating a custom
+     model](https://cloud.ibm.com/docs/services/text-to-speech/custom-models.html#cuModelsCreate).
 
      - parameter name: The name of the new custom voice model.
      - parameter language: The language of the new custom voice model. Omit the parameter to use the the default
        language, `en-US`.
      - parameter description: A description of the new custom voice model. Specifying a description is recommended.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func createVoiceModel(
         name: String,
         language: String? = nil,
         description: String? = nil,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (VoiceModel) -> Void)
+        completionHandler: @escaping (WatsonResponse<VoiceModel>?, WatsonError?) -> Void)
     {
         // construct body
-        let createVoiceModelRequest = CreateVoiceModel(name: name, language: language, description: description)
+        let createVoiceModelRequest = CreateVoiceModel(
+            name: name,
+            language: language,
+            description: description)
         guard let body = try? JSONEncoder().encode(createVoiceModelRequest) else {
-            failure?(RestError.serializationError)
+            completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
 
@@ -472,13 +474,7 @@ public class TextToSpeech {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<VoiceModel>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.responseObject(completionHandler: completionHandler)
     }
 
     /**
@@ -489,19 +485,19 @@ public class TextToSpeech {
      metadata for a specific voice model, use the **List a custom model** method. You must use credentials for the
      instance of the service that owns a model to list information about it.
      **Note:** This method is currently a beta release.
+     **See also:** [Querying all custom
+     models](https://cloud.ibm.com/docs/services/text-to-speech/custom-models.html#cuModelsQueryAll).
 
      - parameter language: The language for which custom voice models that are owned by the requesting service
        credentials are to be returned. Omit the parameter to see all custom voice models that are owned by the
        requester.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func listVoiceModels(
         language: String? = nil,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (VoiceModels) -> Void)
+        completionHandler: @escaping (WatsonResponse<VoiceModels>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
@@ -529,13 +525,7 @@ public class TextToSpeech {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<VoiceModels>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.responseObject(completionHandler: completionHandler)
     }
 
     /**
@@ -546,7 +536,18 @@ public class TextToSpeech {
      a word that already exists in a custom model overwrites the word's existing translation. A custom model can contain
      no more than 20,000 entries. You must use credentials for the instance of the service that owns a model to update
      it.
+     You can define sounds-like or phonetic translations for words. A sounds-like translation consists of one or more
+     words that, when combined, sound like the word. Phonetic translations are based on the SSML phoneme format for
+     representing a word. You can specify them in standard International Phonetic Alphabet (IPA) representation
+       <code>&lt;phoneme alphabet=\"ipa\" ph=\"t&#601;m&#712;&#593;to\"&gt;&lt;/phoneme&gt;</code>
+       or in the proprietary IBM Symbolic Phonetic Representation (SPR)
+       <code>&lt;phoneme alphabet=\"ibm\" ph=\"1gAstroEntxrYFXs\"&gt;&lt;/phoneme&gt;</code>
      **Note:** This method is currently a beta release.
+     **See also:**
+     * [Updating a custom model](https://cloud.ibm.com/docs/services/text-to-speech/custom-models.html#cuModelsUpdate)
+     * [Adding words to a Japanese custom
+     model](https://cloud.ibm.com/docs/services/text-to-speech/custom-entries.html#cuJapaneseAdd)
+     * [Understanding customization](https://cloud.ibm.com/docs/services/text-to-speech/custom-intro.html).
 
      - parameter customizationID: The customization ID (GUID) of the custom voice model. You must make the request
        with service credentials created for the instance of the service that owns the custom model.
@@ -555,8 +556,7 @@ public class TextToSpeech {
      - parameter words: An array of `Word` objects that provides the words and their translations that are to be added
        or updated for the custom voice model. Pass an empty array to make no additions or updates.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func updateVoiceModel(
         customizationID: String,
@@ -564,13 +564,15 @@ public class TextToSpeech {
         description: String? = nil,
         words: [Word]? = nil,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping () -> Void)
+        completionHandler: @escaping (WatsonResponse<Void>?, WatsonError?) -> Void)
     {
         // construct body
-        let updateVoiceModelRequest = UpdateVoiceModel(name: name, description: description, words: words)
+        let updateVoiceModelRequest = UpdateVoiceModel(
+            name: name,
+            description: description,
+            words: words)
         guard let body = try? JSONEncoder().encode(updateVoiceModelRequest) else {
-            failure?(RestError.serializationError)
+            completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
 
@@ -585,7 +587,7 @@ public class TextToSpeech {
         // construct REST request
         let path = "/v1/customizations/\(customizationID)"
         guard let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            failure?(RestError.encodingError)
+            completionHandler(nil, WatsonError.urlEncoding(path: path))
             return
         }
         let request = RestRequest(
@@ -599,13 +601,7 @@ public class TextToSpeech {
         )
 
         // execute REST request
-        request.responseVoid {
-            (response: RestResponse) in
-            switch response.result {
-            case .success: success()
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.response(completionHandler: completionHandler)
     }
 
     /**
@@ -615,18 +611,18 @@ public class TextToSpeech {
      of the voice model, the output includes the words and their translations as defined in the model. To see just the
      metadata for a voice model, use the **List custom models** method.
      **Note:** This method is currently a beta release.
+     **See also:** [Querying a custom
+     model](https://cloud.ibm.com/docs/services/text-to-speech/custom-models.html#cuModelsQuery).
 
      - parameter customizationID: The customization ID (GUID) of the custom voice model. You must make the request
        with service credentials created for the instance of the service that owns the custom model.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func getVoiceModel(
         customizationID: String,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (VoiceModel) -> Void)
+        completionHandler: @escaping (WatsonResponse<VoiceModel>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
@@ -638,7 +634,7 @@ public class TextToSpeech {
         // construct REST request
         let path = "/v1/customizations/\(customizationID)"
         guard let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            failure?(RestError.encodingError)
+            completionHandler(nil, WatsonError.urlEncoding(path: path))
             return
         }
         let request = RestRequest(
@@ -651,13 +647,7 @@ public class TextToSpeech {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<VoiceModel>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.responseObject(completionHandler: completionHandler)
     }
 
     /**
@@ -666,18 +656,18 @@ public class TextToSpeech {
      Deletes the specified custom voice model. You must use credentials for the instance of the service that owns a
      model to delete it.
      **Note:** This method is currently a beta release.
+     **See also:** [Deleting a custom
+     model](https://cloud.ibm.com/docs/services/text-to-speech/custom-models.html#cuModelsDelete).
 
      - parameter customizationID: The customization ID (GUID) of the custom voice model. You must make the request
        with service credentials created for the instance of the service that owns the custom model.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func deleteVoiceModel(
         customizationID: String,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping () -> Void)
+        completionHandler: @escaping (WatsonResponse<Void>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
@@ -688,7 +678,7 @@ public class TextToSpeech {
         // construct REST request
         let path = "/v1/customizations/\(customizationID)"
         guard let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            failure?(RestError.encodingError)
+            completionHandler(nil, WatsonError.urlEncoding(path: path))
             return
         }
         let request = RestRequest(
@@ -701,13 +691,7 @@ public class TextToSpeech {
         )
 
         // execute REST request
-        request.responseVoid {
-            (response: RestResponse) in
-            switch response.result {
-            case .success: success()
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.response(completionHandler: completionHandler)
     }
 
     /**
@@ -717,7 +701,19 @@ public class TextToSpeech {
      word that already exists in a custom model overwrites the word's existing translation. A custom model can contain
      no more than 20,000 entries. You must use credentials for the instance of the service that owns a model to add
      words to it.
+     You can define sounds-like or phonetic translations for words. A sounds-like translation consists of one or more
+     words that, when combined, sound like the word. Phonetic translations are based on the SSML phoneme format for
+     representing a word. You can specify them in standard International Phonetic Alphabet (IPA) representation
+       <code>&lt;phoneme alphabet=\"ipa\" ph=\"t&#601;m&#712;&#593;to\"&gt;&lt;/phoneme&gt;</code>
+       or in the proprietary IBM Symbolic Phonetic Representation (SPR)
+       <code>&lt;phoneme alphabet=\"ibm\" ph=\"1gAstroEntxrYFXs\"&gt;&lt;/phoneme&gt;</code>
      **Note:** This method is currently a beta release.
+     **See also:**
+     * [Adding multiple words to a custom
+     model](https://cloud.ibm.com/docs/services/text-to-speech/custom-entries.html#cuWordsAdd)
+     * [Adding words to a Japanese custom
+     model](https://cloud.ibm.com/docs/services/text-to-speech/custom-entries.html#cuJapaneseAdd)
+     * [Understanding customization](https://cloud.ibm.com/docs/services/text-to-speech/custom-intro.html).
 
      - parameter customizationID: The customization ID (GUID) of the custom voice model. You must make the request
        with service credentials created for the instance of the service that owns the custom model.
@@ -727,20 +723,19 @@ public class TextToSpeech {
        from the custom voice model. The words are listed in alphabetical order, with uppercase letters listed before
        lowercase letters. The array is empty if the custom model contains no words.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func addWords(
         customizationID: String,
         words: [Word],
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping () -> Void)
+        completionHandler: @escaping (WatsonResponse<Void>?, WatsonError?) -> Void)
     {
         // construct body
-        let addWordsRequest = Words(words: words)
+        let addWordsRequest = Words(
+            words: words)
         guard let body = try? JSONEncoder().encode(addWordsRequest) else {
-            failure?(RestError.serializationError)
+            completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
 
@@ -755,7 +750,7 @@ public class TextToSpeech {
         // construct REST request
         let path = "/v1/customizations/\(customizationID)/words"
         guard let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            failure?(RestError.encodingError)
+            completionHandler(nil, WatsonError.urlEncoding(path: path))
             return
         }
         let request = RestRequest(
@@ -769,13 +764,7 @@ public class TextToSpeech {
         )
 
         // execute REST request
-        request.responseVoid {
-            (response: RestResponse) in
-            switch response.result {
-            case .success: success()
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.response(completionHandler: completionHandler)
     }
 
     /**
@@ -785,18 +774,18 @@ public class TextToSpeech {
      translations as they are defined in the model. You must use credentials for the instance of the service that owns a
      model to list its words.
      **Note:** This method is currently a beta release.
+     **See also:** [Querying all words from a custom
+     model](https://cloud.ibm.com/docs/services/text-to-speech/custom-entries.html#cuWordsQueryModel).
 
      - parameter customizationID: The customization ID (GUID) of the custom voice model. You must make the request
        with service credentials created for the instance of the service that owns the custom model.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func listWords(
         customizationID: String,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (Words) -> Void)
+        completionHandler: @escaping (WatsonResponse<Words>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
@@ -808,7 +797,7 @@ public class TextToSpeech {
         // construct REST request
         let path = "/v1/customizations/\(customizationID)/words"
         guard let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            failure?(RestError.encodingError)
+            completionHandler(nil, WatsonError.urlEncoding(path: path))
             return
         }
         let request = RestRequest(
@@ -821,13 +810,7 @@ public class TextToSpeech {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<Words>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.responseObject(completionHandler: completionHandler)
     }
 
     /**
@@ -837,7 +820,19 @@ public class TextToSpeech {
      that already exists in a custom model overwrites the word's existing translation. A custom model can contain no
      more than 20,000 entries. You must use credentials for the instance of the service that owns a model to add a word
      to it.
+     You can define sounds-like or phonetic translations for words. A sounds-like translation consists of one or more
+     words that, when combined, sound like the word. Phonetic translations are based on the SSML phoneme format for
+     representing a word. You can specify them in standard International Phonetic Alphabet (IPA) representation
+       <code>&lt;phoneme alphabet=\"ipa\" ph=\"t&#601;m&#712;&#593;to\"&gt;&lt;/phoneme&gt;</code>
+       or in the proprietary IBM Symbolic Phonetic Representation (SPR)
+       <code>&lt;phoneme alphabet=\"ibm\" ph=\"1gAstroEntxrYFXs\"&gt;&lt;/phoneme&gt;</code>
      **Note:** This method is currently a beta release.
+     **See also:**
+     * [Adding a single word to a custom
+     model](https://cloud.ibm.com/docs/services/text-to-speech/custom-entries.html#cuWordAdd)
+     * [Adding words to a Japanese custom
+     model](https://cloud.ibm.com/docs/services/text-to-speech/custom-entries.html#cuJapaneseAdd)
+     * [Understanding customization](https://cloud.ibm.com/docs/services/text-to-speech/custom-intro.html).
 
      - parameter customizationID: The customization ID (GUID) of the custom voice model. You must make the request
        with service credentials created for the instance of the service that owns the custom model.
@@ -849,10 +844,9 @@ public class TextToSpeech {
        produce the correct intonation for the word. You can create only a single entry, with or without a single part of
        speech, for any word; you cannot create multiple entries with different parts of speech for the same word. For
        more information, see [Working with Japanese
-       entries](https://console.bluemix.net/docs/services/text-to-speech/custom-rules.html#jaNotes).
+       entries](https://cloud.ibm.com/docs/services/text-to-speech/custom-rules.html#jaNotes).
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func addWord(
         customizationID: String,
@@ -860,13 +854,14 @@ public class TextToSpeech {
         translation: String,
         partOfSpeech: String? = nil,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping () -> Void)
+        completionHandler: @escaping (WatsonResponse<Void>?, WatsonError?) -> Void)
     {
         // construct body
-        let addWordRequest = Translation(translation: translation, partOfSpeech: partOfSpeech)
+        let addWordRequest = Translation(
+            translation: translation,
+            partOfSpeech: partOfSpeech)
         guard let body = try? JSONEncoder().encode(addWordRequest) else {
-            failure?(RestError.serializationError)
+            completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
 
@@ -880,7 +875,7 @@ public class TextToSpeech {
         // construct REST request
         let path = "/v1/customizations/\(customizationID)/words/\(word)"
         guard let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            failure?(RestError.encodingError)
+            completionHandler(nil, WatsonError.urlEncoding(path: path))
             return
         }
         let request = RestRequest(
@@ -894,13 +889,7 @@ public class TextToSpeech {
         )
 
         // execute REST request
-        request.responseVoid {
-            (response: RestResponse) in
-            switch response.result {
-            case .success: success()
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.response(completionHandler: completionHandler)
     }
 
     /**
@@ -909,20 +898,20 @@ public class TextToSpeech {
      Gets the translation for a single word from the specified custom model. The output shows the translation as it is
      defined in the model. You must use credentials for the instance of the service that owns a model to list its words.
      **Note:** This method is currently a beta release.
+     **See also:** [Querying a single word from a custom
+     model](https://cloud.ibm.com/docs/services/text-to-speech/custom-entries.html#cuWordQueryModel).
 
      - parameter customizationID: The customization ID (GUID) of the custom voice model. You must make the request
        with service credentials created for the instance of the service that owns the custom model.
      - parameter word: The word that is to be queried from the custom voice model.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func getWord(
         customizationID: String,
         word: String,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (Translation) -> Void)
+        completionHandler: @escaping (WatsonResponse<Translation>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
@@ -934,7 +923,7 @@ public class TextToSpeech {
         // construct REST request
         let path = "/v1/customizations/\(customizationID)/words/\(word)"
         guard let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            failure?(RestError.encodingError)
+            completionHandler(nil, WatsonError.urlEncoding(path: path))
             return
         }
         let request = RestRequest(
@@ -947,13 +936,7 @@ public class TextToSpeech {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<Translation>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.responseObject(completionHandler: completionHandler)
     }
 
     /**
@@ -962,20 +945,20 @@ public class TextToSpeech {
      Deletes a single word from the specified custom voice model. You must use credentials for the instance of the
      service that owns a model to delete its words.
      **Note:** This method is currently a beta release.
+     **See also:** [Deleting a word from a custom
+     model](https://cloud.ibm.com/docs/services/text-to-speech/custom-entries.html#cuWordDelete).
 
      - parameter customizationID: The customization ID (GUID) of the custom voice model. You must make the request
        with service credentials created for the instance of the service that owns the custom model.
      - parameter word: The word that is to be deleted from the custom voice model.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func deleteWord(
         customizationID: String,
         word: String,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping () -> Void)
+        completionHandler: @escaping (WatsonResponse<Void>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
@@ -986,7 +969,7 @@ public class TextToSpeech {
         // construct REST request
         let path = "/v1/customizations/\(customizationID)/words/\(word)"
         guard let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            failure?(RestError.encodingError)
+            completionHandler(nil, WatsonError.urlEncoding(path: path))
             return
         }
         let request = RestRequest(
@@ -999,13 +982,7 @@ public class TextToSpeech {
         )
 
         // execute REST request
-        request.responseVoid {
-            (response: RestResponse) in
-            switch response.result {
-            case .success: success()
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.response(completionHandler: completionHandler)
     }
 
     /**
@@ -1016,19 +993,17 @@ public class TextToSpeech {
      the customer ID. You must issue the request with credentials for the same instance of the service that was used to
      associate the customer ID with the data.
      You associate a customer ID with data by passing the `X-Watson-Metadata` header with a request that passes the
-     data. For more information about customer IDs and about using this method, see [Information
-     security](https://console.bluemix.net/docs/services/text-to-speech/information-security.html).
+     data.
+     **See also:** [Information security](https://cloud.ibm.com/docs/services/text-to-speech/information-security.html).
 
      - parameter customerID: The customer ID for which all data is to be deleted.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func deleteUserData(
         customerID: String,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping () -> Void)
+        completionHandler: @escaping (WatsonResponse<Void>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
@@ -1052,13 +1027,7 @@ public class TextToSpeech {
         )
 
         // execute REST request
-        request.responseVoid {
-            (response: RestResponse) in
-            switch response.result {
-            case .success: success()
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.response(completionHandler: completionHandler)
     }
 
 }
