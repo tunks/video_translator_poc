@@ -18,7 +18,7 @@ import Foundation
 import RestKit
 
 /** UpdateWorkspace. */
-public struct UpdateWorkspace: Encodable {
+internal struct UpdateWorkspace: Codable, Equatable {
 
     /**
      The name of the workspace. This string cannot contain carriage return, newline, or tab characters, and it must be
@@ -48,7 +48,7 @@ public struct UpdateWorkspace: Encodable {
     public var entities: [CreateEntity]?
 
     /**
-     An array of objects defining the nodes in the workspace dialog.
+     An array of objects defining the nodes in the dialog.
      */
     public var dialogNodes: [CreateDialogNode]?
 
@@ -97,7 +97,7 @@ public struct UpdateWorkspace: Encodable {
      - parameter language: The language of the workspace.
      - parameter intents: An array of objects defining the intents for the workspace.
      - parameter entities: An array of objects defining the entities for the workspace.
-     - parameter dialogNodes: An array of objects defining the nodes in the workspace dialog.
+     - parameter dialogNodes: An array of objects defining the nodes in the dialog.
      - parameter counterexamples: An array of objects defining input examples that have been marked as irrelevant
        input.
      - parameter metadata: Any metadata related to the workspace.

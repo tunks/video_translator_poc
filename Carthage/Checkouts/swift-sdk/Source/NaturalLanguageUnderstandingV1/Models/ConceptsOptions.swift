@@ -17,9 +17,11 @@
 import Foundation
 
 /**
- Whether or not to analyze content for general concepts that are referenced or alluded to.
+ Returns high-level concepts in the content. For example, a research paper about deep learning might return the concept,
+ "Artificial Intelligence" although the term is not mentioned.
+ Supported languages: English, French, German, Italian, Japanese, Korean, Portuguese, Spanish.
  */
-public struct ConceptsOptions: Encodable {
+public struct ConceptsOptions: Codable, Equatable {
 
     /**
      Maximum number of concepts to return.

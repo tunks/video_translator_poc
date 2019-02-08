@@ -40,7 +40,7 @@
 			<key>Key</key>
 			<string>video_url</string>
 			<key>DefaultValue</key>
-			<string>http://dev.etunkara.info/videos/Fiber_multi_family.mp4</string>
+			<string>http://dev2.etunkara.info:18080/videos/Fiber_multi_family.mp4</string>
 			<key>IsSecure</key>
 			<false/>
 			<key>KeyboardType</key>

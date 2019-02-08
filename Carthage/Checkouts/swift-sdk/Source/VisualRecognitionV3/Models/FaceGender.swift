@@ -19,7 +19,7 @@ import Foundation
 /**
  Information about the gender of the face.
  */
-public struct FaceGender: Decodable {
+public struct FaceGender: Codable, Equatable {
 
     /**
      Gender identified by the face. For example, `MALE` or `FEMALE`.
@@ -27,14 +27,20 @@ public struct FaceGender: Decodable {
     public var gender: String
 
     /**
+     The word for "male" or "female" in the language defined by the **Accept-Language** request header.
+     */
+    public var genderLabel: String
+
+    /**
      Confidence score in the range of 0 to 1. A higher score indicates greater confidence in the estimated value for the
      property.
      */
-    public var score: Double?
+    public var score: Double
 
     // Map each property name to the key that shall be used for encoding/decoding.
     private enum CodingKeys: String, CodingKey {
         case gender = "gender"
+        case genderLabel = "gender_label"
         case score = "score"
     }
 

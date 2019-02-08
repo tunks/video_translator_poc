@@ -16,8 +16,11 @@
 
 import Foundation
 
-/** WorkspaceSystemSettingsDisambiguation. */
-public struct WorkspaceSystemSettingsDisambiguation: Codable {
+/**
+ Workspace settings related to the disambiguation feature.
+ **Note:** This feature is available only to Premium users.
+ */
+public struct WorkspaceSystemSettingsDisambiguation: Codable, Equatable {
 
     /**
      The sensitivity of the disambiguation feature to intent detection conflicts. Set to **high** if you want the

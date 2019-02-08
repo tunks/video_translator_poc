@@ -18,7 +18,7 @@ import Foundation
 import RestKit
 
 /** UpdateDialogNode. */
-public struct UpdateDialogNode: Encodable {
+internal struct UpdateDialogNode: Codable, Equatable {
 
     /**
      How the dialog node is processed.
@@ -60,9 +60,9 @@ public struct UpdateDialogNode: Encodable {
      Whether this dialog node can be returned to after a digression.
      */
     public enum DigressOut: String {
-        case returning = "allow_returning"
-        case all = "allow_all"
-        case allNeverReturn = "allow_all_never_return"
+        case allowReturning = "allow_returning"
+        case allowAll = "allow_all"
+        case allowAllNeverReturn = "allow_all_never_return"
     }
 
     /**
@@ -105,7 +105,7 @@ public struct UpdateDialogNode: Encodable {
 
     /**
      The output of the dialog node. For more information about how to specify dialog node output, see the
-     [documentation](https://console.bluemix.net/docs/services/conversation/dialog-overview.html#complex).
+     [documentation](https://cloud.ibm.com/docs/services/assistant/dialog-overview.html#complex).
      */
     public var output: DialogNodeOutput?
 
@@ -120,7 +120,7 @@ public struct UpdateDialogNode: Encodable {
     public var metadata: [String: JSON]?
 
     /**
-     The next step to be executed in dialog processing.
+     The next step to execute following this dialog node.
      */
     public var nextStep: DialogNodeNextStep?
 
@@ -167,7 +167,8 @@ public struct UpdateDialogNode: Encodable {
     public var digressOutSlots: String?
 
     /**
-     A label that can be displayed externally to describe the purpose of the node to users.
+     A label that can be displayed externally to describe the purpose of the node to users. This string must be no
+     longer than 512 characters.
      */
     public var userLabel: String?
 
@@ -206,10 +207,10 @@ public struct UpdateDialogNode: Encodable {
      - parameter parent: The ID of the parent dialog node.
      - parameter previousSibling: The ID of the previous sibling dialog node.
      - parameter output: The output of the dialog node. For more information about how to specify dialog node output,
-       see the [documentation](https://console.bluemix.net/docs/services/conversation/dialog-overview.html#complex).
+       see the [documentation](https://cloud.ibm.com/docs/services/assistant/dialog-overview.html#complex).
      - parameter context: The context for the dialog node.
      - parameter metadata: The metadata for the dialog node.
-     - parameter nextStep: The next step to be executed in dialog processing.
+     - parameter nextStep: The next step to execute following this dialog node.
      - parameter title: The alias used to identify the dialog node. This string must conform to the following
        restrictions:
        - It can contain only Unicode alphanumeric, space, underscore, hyphen, and dot characters.
@@ -222,6 +223,7 @@ public struct UpdateDialogNode: Encodable {
      - parameter digressOut: Whether this dialog node can be returned to after a digression.
      - parameter digressOutSlots: Whether the user can digress to top-level nodes while filling out slots.
      - parameter userLabel: A label that can be displayed externally to describe the purpose of the node to users.
+       This string must be no longer than 512 characters.
 
      - returns: An initialized `UpdateDialogNode`.
     */

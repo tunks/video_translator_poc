@@ -6,16 +6,15 @@
 //  Created by Jishnu Raj T on 26/04/18.
 //  Copyright © 2018 JRiOSdev. All rights reserved.
 //
-
 import UIKit
 
-public class DropDown : UITextField{
+open class DropDown : UITextField{
     
     var arrow : Arrow!
     var table : UITableView!
     var shadow : UIView!
     
-    public fileprivate(set) var selectedIndex: Int?
+    public  var selectedIndex: Int?
     
     
     //MARK: IBInspectable
@@ -76,10 +75,10 @@ public class DropDown : UITextField{
             self.table.reloadData()
         }
     }
-    fileprivate var arrowPadding: CGFloat = 5 {
+    @IBInspectable public var arrowSize: CGFloat = 15 {
         didSet{
-            let size = arrow.superview!.frame.size.width-(arrowPadding*2)
-            arrow.frame = CGRect(x: arrowPadding, y: arrowPadding, width: size, height: size)
+            let center =  arrow.superview!.center
+            arrow.frame = CGRect(x: center.x - arrowSize/2, y: center.y - arrowSize/2, width: arrowSize, height: arrowSize)
         }
     }
   
@@ -106,13 +105,13 @@ public class DropDown : UITextField{
     
     func setupUI () {
        let size = self.frame.height
-        let rightView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: size - 2*arrowPadding, height: size))
+        let rightView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: size, height: size))
         self.rightView = rightView
         self.rightViewMode = .always
         let arrowContainerView = UIView(frame: rightView.frame)
         self.rightView?.addSubview(arrowContainerView)
-        let arrowSize = arrowContainerView.frame.width - (arrowPadding*2)
-        arrow = Arrow(origin: CGPoint(x: arrowPadding,y: arrowContainerView.center.y-(arrowSize/2)),size: arrowSize)
+        let center = arrowContainerView.center
+        arrow = Arrow(origin: CGPoint(x: center.x - arrowSize/2,y: center.y - arrowSize/2),size: arrowSize)
         arrowContainerView.addSubview(arrow)
         addGesture()
     }
@@ -266,7 +265,7 @@ extension DropDown : UITextFieldDelegate {
     }
     public func  textFieldDidBeginEditing(_ textField: UITextField) {
         textField.text = ""
-        self.selectedIndex = nil
+        //self.selectedIndex = nil
         self.dataArray = self.optionArray
         touchAction()
     }
@@ -357,7 +356,6 @@ extension DropDown: UITableViewDelegate {
 
 
 //MARK: Arrow
-
 enum Position {
     case left
     case down
@@ -417,7 +415,11 @@ class Arrow: UIView {
         // Mask to path
         let shapeLayer = CAShapeLayer()
         shapeLayer.path = bezierPath.cgPath
-        self.layer.mask = shapeLayer
+        if #available(iOS 12.0, *) {
+        self.layer.addSublayer (shapeLayer)
+        } else {
+         self.layer.mask = shapeLayer
+        }
     }
 }
 

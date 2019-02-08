@@ -16,8 +16,8 @@
 
 import Foundation
 
-/** PdfHeadingDetection. */
-public struct PdfHeadingDetection: Codable {
+/** PDFHeadingDetection. */
+public struct PDFHeadingDetection: Codable, Equatable {
 
     public var fonts: [FontSetting]?
 
@@ -27,11 +27,11 @@ public struct PdfHeadingDetection: Codable {
     }
 
     /**
-     Initialize a `PdfHeadingDetection` with member variables.
+     Initialize a `PDFHeadingDetection` with member variables.
 
      - parameter fonts:
 
-     - returns: An initialized `PdfHeadingDetection`.
+     - returns: An initialized `PDFHeadingDetection`.
     */
     public init(
         fonts: [FontSetting]? = nil

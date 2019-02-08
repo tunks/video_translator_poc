@@ -17,10 +17,13 @@
 import Foundation
 
 /**
- Models available for Relations and Entities features.
+ Custom models that are available for entities and relations.
  */
-public struct ListModelsResults: Decodable {
+public struct ListModelsResults: Codable, Equatable {
 
+    /**
+     An array of available models.
+     */
     public var models: [Model]?
 
     // Map each property name to the key that shall be used for encoding/decoding.

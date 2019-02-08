@@ -1,8 +1,8 @@
 PODS:
-  - Eureka (4.2.0)
-  - iOSDropDown (0.2.4)
-  - MarqueeLabel/Swift (3.1.6)
-  - SnapKit (4.0.0)
+  - Eureka (4.3.1)
+  - iOSDropDown (0.2.7)
+  - MarqueeLabel/Swift (3.2.0)
+  - SnapKit (4.0.1)
   - VGPlayer (0.2.0):
     - SnapKit (~> 4.0.0)
 
@@ -21,12 +21,12 @@ SPEC REPOS:
     - VGPlayer
 
 SPEC CHECKSUMS:
-  Eureka: 0748c7bbb2560130e43c7bfa83e99c98854a1f42
-  iOSDropDown: 6d928eddd336c7bc698ad0ba4b324ce3d2d43c59
-  MarqueeLabel: 0c41f08ef5773e29c0f71064a8fa788a2fd8b365
-  SnapKit: a42d492c16e80209130a3379f73596c3454b7694
+  Eureka: 28ea296f06710f6745266b71f17862048941a32d
+  iOSDropDown: 7a4cfc67d5166f319858747b63cd2f7760c4fb4b
+  MarqueeLabel: 440a502b91a9179bd98f9fff00ba1150650a1c0e
+  SnapKit: 0de968a9fec17499afa29683b05d0c775b6d1c29
   VGPlayer: a1787135559aa3b9201ebdc733ee283315492289
 
 PODFILE CHECKSUM: 2446828215db1fc3587145c84853c3394981873b
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.6.0

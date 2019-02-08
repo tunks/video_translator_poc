@@ -19,7 +19,7 @@ import Foundation
 /**
  The relations between entities found in the content.
  */
-public struct RelationsResult: Decodable {
+public struct RelationsResult: Codable, Equatable {
 
     /**
      Confidence score for the relation. Higher values indicate greater confidence.
@@ -37,7 +37,7 @@ public struct RelationsResult: Decodable {
     public var type: String?
 
     /**
-     The extracted relation objects from the text.
+     Entity mentions that are involved in the relation.
      */
     public var arguments: [RelationArgument]?
 

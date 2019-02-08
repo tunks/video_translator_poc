@@ -27,11 +27,11 @@ import RestKit
  personality characteristics. The service can infer consumption preferences based on the results of its analysis and,
  for JSON content that is timestamped, can report temporal behavior.
  * For information about the meaning of the models that the service uses to describe personality characteristics, see
- [Personality models](https://console.bluemix.net/docs/services/personality-insights/models.html).
+ [Personality models](https://cloud.ibm.com/docs/services/personality-insights/models.html).
  * For information about the meaning of the consumption preferences, see [Consumption
- preferences](https://console.bluemix.net/docs/services/personality-insights/preferences.html).
- **Note:** Request logging is disabled for the Personality Insights service. The service neither logs nor retains data
- from requests and responses, regardless of whether the `X-Watson-Learning-Opt-Out` request header is set.
+ preferences](https://cloud.ibm.com/docs/services/personality-insights/preferences.html).
+ **Note:** Request logging is disabled for the Personality Insights service. Regardless of whether you set the
+ `X-Watson-Learning-Opt-Out` request header, the service does not log or retain data from requests and responses.
  */
 public class PersonalityInsights {
 
@@ -41,10 +41,9 @@ public class PersonalityInsights {
     /// The default HTTP headers for all requests to the service.
     public var defaultHeaders = [String: String]()
 
-    private let session = URLSession(configuration: URLSessionConfiguration.default)
-    private var authMethod: AuthenticationMethod
-    private let domain = "com.ibm.watson.developer-cloud.PersonalityInsightsV3"
-    private let version: String
+    var session = URLSession(configuration: URLSessionConfiguration.default)
+    var authMethod: AuthenticationMethod
+    let version: String
 
     /**
      Create a `PersonalityInsights` object.
@@ -55,8 +54,9 @@ public class PersonalityInsights {
        in "YYYY-MM-DD" format.
      */
     public init(username: String, password: String, version: String) {
-        self.authMethod = BasicAuthentication(username: username, password: password)
+        self.authMethod = Shared.getAuthMethod(username: username, password: password)
         self.version = version
+        Shared.configureRestRequest()
     }
 
     /**
@@ -68,8 +68,9 @@ public class PersonalityInsights {
      - parameter iamUrl: The URL for the IAM service.
      */
     public init(version: String, apiKey: String, iamUrl: String? = nil) {
+        self.authMethod = Shared.getAuthMethod(apiKey: apiKey, iamURL: iamUrl)
         self.version = version
-        self.authMethod = IAMAuthentication(apiKey: apiKey, url: iamUrl)
+        Shared.configureRestRequest()
     }
 
     /**
@@ -80,8 +81,9 @@ public class PersonalityInsights {
      - parameter accessToken: An access token for the service.
      */
     public init(version: String, accessToken: String) {
-        self.version = version
         self.authMethod = IAMAccessToken(accessToken: accessToken)
+        self.version = version
+        Shared.configureRestRequest()
     }
 
     public func accessToken(_ newToken: String) {
@@ -91,27 +93,31 @@ public class PersonalityInsights {
     }
 
     /**
-     If the response or data represents an error returned by the Personality Insights service,
-     then return NSError with information about the error that occured. Otherwise, return nil.
+     Use the HTTP response and data received by the Personality Insights service to extract
+     information about the error that occurred.
 
-     - parameter data: Raw data returned from the service that may represent an error.
-     - parameter response: the URL response returned from the service.
+     - parameter data: Raw data returned by the service that may represent an error.
+     - parameter response: the URL response returned by the service.
      */
-    private func errorResponseDecoder(data: Data, response: HTTPURLResponse) -> Error {
+    func errorResponseDecoder(data: Data, response: HTTPURLResponse) -> WatsonError {
 
-        let code = response.statusCode
+        let statusCode = response.statusCode
+        var errorMessage: String?
+        var metadata = [String: Any]()
+
         do {
             let json = try JSONDecoder().decode([String: JSON].self, from: data)
-            var userInfo: [String: Any] = [:]
+            metadata = [:]
             if case let .some(.string(message)) = json["error"] {
-                userInfo[NSLocalizedDescriptionKey] = message
+                errorMessage = message
             }
             if case let .some(.string(help)) = json["help"] {
-                userInfo[NSLocalizedFailureReasonErrorKey] = help
+                metadata["help"] = help
             }
-            return NSError(domain: domain, code: code, userInfo: userInfo)
+            // If metadata is empty, it should show up as nil in the WatsonError
+            return WatsonError.http(statusCode: statusCode, message: errorMessage, metadata: !metadata.isEmpty ? metadata : nil)
         } catch {
-            return NSError(domain: domain, code: code, userInfo: nil)
+            return WatsonError.http(statusCode: statusCode, message: nil, metadata: nil)
         }
     }
 
@@ -119,25 +125,33 @@ public class PersonalityInsights {
      Get profile.
 
      Generates a personality profile for the author of the input text. The service accepts a maximum of 20 MB of input
-     content, but it requires much less text to produce an accurate profile; for more information, see [Providing
-     sufficient input](https://console.bluemix.net/docs/services/personality-insights/input.html#sufficient). The
-     service analyzes text in Arabic, English, Japanese, Korean, or Spanish and returns its results in a variety of
-     languages. You can provide plain text, HTML, or JSON input by specifying the **Content-Type** parameter; the
-     default is `text/plain`. Request a JSON or comma-separated values (CSV) response by specifying the **Accept**
-     parameter; CSV output includes a fixed number of columns and optional headers.
-     Per the JSON specification, the default character encoding for JSON content is effectively always UTF-8; per the
-     HTTP specification, the default encoding for plain text and HTML is ISO-8859-1 (effectively, the ASCII character
-     set). When specifying a content type of plain text or HTML, include the `charset` parameter to indicate the
-     character encoding of the input text; for example: `Content-Type: text/plain;charset=utf-8`.
-     For detailed information about calling the service and the responses it can generate, see [Requesting a
-     profile](https://console.bluemix.net/docs/services/personality-insights/input.html), [Understanding a JSON
-     profile](https://console.bluemix.net/docs/services/personality-insights/output.html), and [Understanding a CSV
-     profile](https://console.bluemix.net/docs/services/personality-insights/output-csv.html).
+     content, but it requires much less text to produce an accurate profile. The service can analyze text in Arabic,
+     English, Japanese, Korean, or Spanish. It can return its results in a variety of languages.
+     **See also:**
+     * [Requesting a profile](https://cloud.ibm.com/docs/services/personality-insights/input.html)
+     * [Providing sufficient input](https://cloud.ibm.com/docs/services/personality-insights/input.html#sufficient)
+     ### Content types
+      You can provide input content as plain text (`text/plain`), HTML (`text/html`), or JSON (`application/json`) by
+     specifying the **Content-Type** parameter. The default is `text/plain`.
+     * Per the JSON specification, the default character encoding for JSON content is effectively always UTF-8.
+     * Per the HTTP specification, the default encoding for plain text and HTML is ISO-8859-1 (effectively, the ASCII
+     character set).
+     When specifying a content type of plain text or HTML, include the `charset` parameter to indicate the character
+     encoding of the input text; for example, `Content-Type: text/plain;charset=utf-8`.
+     **See also:** [Specifying request and response
+     formats](https://cloud.ibm.com/docs/services/personality-insights/input.html#formats)
+     ### Accept types
+      You must request a response as JSON (`application/json`) or comma-separated values (`text/csv`) by specifying the
+     **Accept** parameter. CSV output includes a fixed number of columns. Set the **csv_headers** parameter to `true` to
+     request optional column headers for CSV output.
+     **See also:**
+     * [Understanding a JSON profile](https://cloud.ibm.com/docs/services/personality-insights/output.html)
+     * [Understanding a CSV profile](https://cloud.ibm.com/docs/services/personality-insights/output-csv.html).
 
      - parameter profileContent: A maximum of 20 MB of content to analyze, though the service requires much less text;
        for more information, see [Providing sufficient
-       input](https://console.bluemix.net/docs/services/personality-insights/input.html#sufficient). For JSON input,
-       provide an object of type `Content`.
+       input](https://cloud.ibm.com/docs/services/personality-insights/input.html#sufficient). For JSON input, provide
+       an object of type `Content`.
      - parameter contentLanguage: The language of the input text for the request: Arabic, English, Japanese, Korean,
        or Spanish. Regional variants are treated as their parent language; for example, `en-US` is interpreted as `en`.
        The effect of the **Content-Language** parameter depends on the **Content-Type** parameter. When **Content-Type**
@@ -155,8 +169,7 @@ public class PersonalityInsights {
      - parameter consumptionPreferences: Indicates whether consumption preferences are returned with the results. By
        default, no consumption preferences are returned.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
     public func profile(
         profileContent: ProfileContent,
@@ -165,12 +178,11 @@ public class PersonalityInsights {
         rawScores: Bool? = nil,
         consumptionPreferences: Bool? = nil,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (Profile) -> Void)
+        completionHandler: @escaping (WatsonResponse<Profile>?, WatsonError?) -> Void)
     {
         // construct body
         guard let body = profileContent.content else {
-            failure?(RestError.serializationError)
+            completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
 
@@ -213,38 +225,40 @@ public class PersonalityInsights {
         )
 
         // execute REST request
-        request.responseObject {
-            (response: RestResponse<Profile>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.responseObject(completionHandler: completionHandler)
     }
 
     /**
      Get profile as csv.
 
      Generates a personality profile for the author of the input text. The service accepts a maximum of 20 MB of input
-     content, but it requires much less text to produce an accurate profile; for more information, see [Providing
-     sufficient input](https://console.bluemix.net/docs/services/personality-insights/input.html#sufficient). The
-     service analyzes text in Arabic, English, Japanese, Korean, or Spanish and returns its results in a variety of
-     languages. You can provide plain text, HTML, or JSON input by specifying the **Content-Type** parameter; the
-     default is `text/plain`. Request a JSON or comma-separated values (CSV) response by specifying the **Accept**
-     parameter; CSV output includes a fixed number of columns and optional headers.
-     Per the JSON specification, the default character encoding for JSON content is effectively always UTF-8; per the
-     HTTP specification, the default encoding for plain text and HTML is ISO-8859-1 (effectively, the ASCII character
-     set). When specifying a content type of plain text or HTML, include the `charset` parameter to indicate the
-     character encoding of the input text; for example: `Content-Type: text/plain;charset=utf-8`.
-     For detailed information about calling the service and the responses it can generate, see [Requesting a
-     profile](https://console.bluemix.net/docs/services/personality-insights/input.html), [Understanding a JSON
-     profile](https://console.bluemix.net/docs/services/personality-insights/output.html), and [Understanding a CSV
-     profile](https://console.bluemix.net/docs/services/personality-insights/output-csv.html).
+     content, but it requires much less text to produce an accurate profile. The service can analyze text in Arabic,
+     English, Japanese, Korean, or Spanish. It can return its results in a variety of languages.
+     **See also:**
+     * [Requesting a profile](https://cloud.ibm.com/docs/services/personality-insights/input.html)
+     * [Providing sufficient input](https://cloud.ibm.com/docs/services/personality-insights/input.html#sufficient)
+     ### Content types
+      You can provide input content as plain text (`text/plain`), HTML (`text/html`), or JSON (`application/json`) by
+     specifying the **Content-Type** parameter. The default is `text/plain`.
+     * Per the JSON specification, the default character encoding for JSON content is effectively always UTF-8.
+     * Per the HTTP specification, the default encoding for plain text and HTML is ISO-8859-1 (effectively, the ASCII
+     character set).
+     When specifying a content type of plain text or HTML, include the `charset` parameter to indicate the character
+     encoding of the input text; for example, `Content-Type: text/plain;charset=utf-8`.
+     **See also:** [Specifying request and response
+     formats](https://cloud.ibm.com/docs/services/personality-insights/input.html#formats)
+     ### Accept types
+      You must request a response as JSON (`application/json`) or comma-separated values (`text/csv`) by specifying the
+     **Accept** parameter. CSV output includes a fixed number of columns. Set the **csv_headers** parameter to `true` to
+     request optional column headers for CSV output.
+     **See also:**
+     * [Understanding a JSON profile](https://cloud.ibm.com/docs/services/personality-insights/output.html)
+     * [Understanding a CSV profile](https://cloud.ibm.com/docs/services/personality-insights/output-csv.html).
 
      - parameter profileContent: A maximum of 20 MB of content to analyze, though the service requires much less text;
        for more information, see [Providing sufficient
-       input](https://console.bluemix.net/docs/services/personality-insights/input.html#sufficient). For JSON input,
-       provide an object of type `Content`.
+       input](https://cloud.ibm.com/docs/services/personality-insights/input.html#sufficient). For JSON input, provide
+       an object of type `Content`.
      - parameter contentLanguage: The language of the input text for the request: Arabic, English, Japanese, Korean,
        or Spanish. Regional variants are treated as their parent language; for example, `en-US` is interpreted as `en`.
        The effect of the **Content-Language** parameter depends on the **Content-Type** parameter. When **Content-Type**
@@ -260,14 +274,13 @@ public class PersonalityInsights {
        characteristic; raw scores are not compared with a sample population. By default, only normalized percentiles are
        returned.
      - parameter csvHeaders: Indicates whether column labels are returned with a CSV response. By default, no column
-       labels are returned. Applies only when the **Accept** parameter is set to `text/csv`.
+       labels are returned. Applies only when the response type is CSV (`text/csv`).
      - parameter consumptionPreferences: Indicates whether consumption preferences are returned with the results. By
        default, no consumption preferences are returned.
      - parameter headers: A dictionary of request headers to be sent with this request.
-     - parameter failure: A function executed if an error occurs.
-     - parameter success: A function executed with the successful result.
+     - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
-    public func profileAsCsv(
+    public func profileAsCSV(
         profileContent: ProfileContent,
         contentLanguage: String? = nil,
         acceptLanguage: String? = nil,
@@ -275,12 +288,11 @@ public class PersonalityInsights {
         csvHeaders: Bool? = nil,
         consumptionPreferences: Bool? = nil,
         headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (String) -> Void)
+        completionHandler: @escaping (WatsonResponse<String>?, WatsonError?) -> Void)
     {
         // construct body
         guard let body = profileContent.content else {
-            failure?(RestError.serializationError)
+            completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
 
@@ -327,115 +339,7 @@ public class PersonalityInsights {
         )
 
         // execute REST request
-        request.responseString {
-            (response: RestResponse<String>) in
-            switch response.result {
-            case .success(let retval): success(retval)
-            case .failure(let error): failure?(error)
-            }
-        }
+        request.response(completionHandler: completionHandler)
     }
 
-}
-
-extension PersonalityInsights {
-
-    @available(*, deprecated, message: "This method has been deprecated in favor of the profile method that accepts a profileContent parameter.  This method will be removed in a future release.")
-    public func profile(
-        content: Content,
-        contentLanguage: String? = nil,
-        acceptLanguage: String? = nil,
-        rawScores: Bool? = nil,
-        consumptionPreferences: Bool? = nil,
-        headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (Profile) -> Void)
-    {
-        profile(profileContent: .content(content), contentLanguage: contentLanguage, acceptLanguage: acceptLanguage,
-                rawScores: rawScores, consumptionPreferences: consumptionPreferences, headers: headers,
-                failure: failure, success: success)
-    }
-
-    @available(*, deprecated, message: "This method has been deprecated in favor of the profile method that accepts a profileContent parameter.  This method will be removed in a future release.")
-    public func profile(
-        text: String,
-        contentLanguage: String? = nil,
-        acceptLanguage: String? = nil,
-        rawScores: Bool? = nil,
-        consumptionPreferences: Bool? = nil,
-        headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (Profile) -> Void)
-    {
-        profile(profileContent: .text(text), contentLanguage: contentLanguage, acceptLanguage: acceptLanguage,
-                rawScores: rawScores, consumptionPreferences: consumptionPreferences, headers: headers,
-                failure: failure, success: success)
-    }
-
-    @available(*, deprecated, message: "This method has been deprecated in favor of the profile method that accepts a profileContent parameter.  This method will be removed in a future release.")
-    public func profile(
-        html: String,
-        contentLanguage: String? = nil,
-        acceptLanguage: String? = nil,
-        rawScores: Bool? = nil,
-        consumptionPreferences: Bool? = nil,
-        headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (Profile) -> Void)
-    {
-        profile(profileContent: .html(html), contentLanguage: contentLanguage, acceptLanguage: acceptLanguage,
-                rawScores: rawScores, consumptionPreferences: consumptionPreferences, headers: headers,
-                failure: failure, success: success)
-    }
-
-    @available(*, deprecated, message: "This method has been deprecated in favor of the profileAsCsv method that accepts a profileContent parameter.  This method will be removed in a future release.")
-    public func profileAsCsv(
-        content: Content,
-        contentLanguage: String? = nil,
-        acceptLanguage: String? = nil,
-        rawScores: Bool? = nil,
-        csvHeaders: Bool? = nil,
-        consumptionPreferences: Bool? = nil,
-        headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (String) -> Void)
-    {
-        profileAsCsv(profileContent: .content(content), contentLanguage: contentLanguage, acceptLanguage: acceptLanguage,
-                     rawScores: rawScores, csvHeaders: csvHeaders, consumptionPreferences: consumptionPreferences, headers: headers,
-                     failure: failure, success: success)
-    }
-
-    @available(*, deprecated, message: "This method has been deprecated in favor of the profileAsCsv method that accepts a profileContent parameter.  This method will be removed in a future release.")
-    public func profileAsCsv(
-        text: String,
-        contentLanguage: String? = nil,
-        acceptLanguage: String? = nil,
-        rawScores: Bool? = nil,
-        csvHeaders: Bool? = nil,
-        consumptionPreferences: Bool? = nil,
-        headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (String) -> Void)
-    {
-        profileAsCsv(profileContent: .text(text), contentLanguage: contentLanguage, acceptLanguage: acceptLanguage,
-                     rawScores: rawScores, csvHeaders: csvHeaders, consumptionPreferences: consumptionPreferences, headers: headers,
-                     failure: failure, success: success)
-    }
-
-    @available(*, deprecated, message: "This method has been deprecated in favor of the profileAsCsv method that accepts a profileContent parameter.  This method will be removed in a future release.")
-    public func profileAsCsv(
-        html: String,
-        contentLanguage: String? = nil,
-        acceptLanguage: String? = nil,
-        rawScores: Bool? = nil,
-        csvHeaders: Bool? = nil,
-        consumptionPreferences: Bool? = nil,
-        headers: [String: String]? = nil,
-        failure: ((Error) -> Void)? = nil,
-        success: @escaping (String) -> Void)
-    {
-        profileAsCsv(profileContent: .html(html), contentLanguage: contentLanguage, acceptLanguage: acceptLanguage,
-                     rawScores: rawScores, csvHeaders: csvHeaders, consumptionPreferences: consumptionPreferences, headers: headers,
-                     failure: failure, success: success)
-    }
 }

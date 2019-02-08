@@ -17,10 +17,10 @@
 import Foundation
 
 /** LogExport. */
-public struct LogExport: Decodable {
+public struct LogExport: Codable, Equatable {
 
     /**
-     A request received by the workspace, including the user input and context.
+     A request sent to the workspace, including the user input and context.
      */
     public var request: MessageRequest
 

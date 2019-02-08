@@ -43,11 +43,11 @@ class WatsonLanguageTranslator : Translator {
     }
     
     func translate(text: String, source: String, target: String, completion: @escaping (_ text: String?) -> Void){
-       let  request = TranslateRequest(text: [text], modelID: modelId(source, target),
-                                        source: source, target: target )
-        self.translator.translate(request: request, failure: failure, success: { (translation) -> Void in
-            self.handler?.handle(result: translation, language: target, completion: completion)
-        })
+        ///source: "en", target: "es"
+        //let modelId = ModelId(source,target)
+        self.translator.translate(text: [text], source: source, target: target) { (response,error) in
+            self.handler?.handle(result: (response?.result)!, language: target,completion: completion)
+        }
     }
     
     func pause(pause: Bool?) {

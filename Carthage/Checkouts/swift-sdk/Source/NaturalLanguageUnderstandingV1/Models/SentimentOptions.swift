@@ -17,12 +17,14 @@
 import Foundation
 
 /**
- An option specifying if sentiment of detected entities, keywords, or phrases should be returned.
+ Analyzes the general sentiment of your content or the sentiment toward specific target phrases. You can analyze
+ sentiment for detected entities with `entities.sentiment` and for keywords with `keywords.sentiment`.
+  Supported languages: Arabic, English, French, German, Italian, Japanese, Korean, Portuguese, Russian, Spanish.
  */
-public struct SentimentOptions: Encodable {
+public struct SentimentOptions: Codable, Equatable {
 
     /**
-     Set this to false to hide document-level sentiment results.
+     Set this to `false` to hide document-level sentiment results.
      */
     public var document: Bool?
 
@@ -40,7 +42,7 @@ public struct SentimentOptions: Encodable {
     /**
      Initialize a `SentimentOptions` with member variables.
 
-     - parameter document: Set this to false to hide document-level sentiment results.
+     - parameter document: Set this to `false` to hide document-level sentiment results.
      - parameter targets: Sentiment results will be returned for each target string that is found in the document.
 
      - returns: An initialized `SentimentOptions`.

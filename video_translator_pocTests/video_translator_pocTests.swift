@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import video_translator_poc
+//@testable import video_translator_poc
 
 class video_translator_pocTests: XCTestCase {
     

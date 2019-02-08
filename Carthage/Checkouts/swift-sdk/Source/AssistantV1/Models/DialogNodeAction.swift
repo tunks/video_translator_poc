@@ -18,7 +18,7 @@ import Foundation
 import RestKit
 
 /** DialogNodeAction. */
-public struct DialogNodeAction: Codable {
+public struct DialogNodeAction: Codable, Equatable {
 
     /**
      The type of action to invoke.
@@ -26,6 +26,8 @@ public struct DialogNodeAction: Codable {
     public enum ActionType: String {
         case client = "client"
         case server = "server"
+        case cloudFunction = "cloud_function"
+        case webAction = "web_action"
     }
 
     /**
